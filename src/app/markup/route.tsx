@@ -12,8 +12,6 @@ export async function POST(request: Request) {
     url.searchParams.append(key, String(value));
   }
 
-  console.log(url.toString());
-
   const response = await fetch(url, {
     method: 'GET',
   });

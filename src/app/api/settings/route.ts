@@ -1,5 +1,6 @@
 import { SettingsSchema } from '@/app/settings/types';
 import { put } from '@vercel/blob';
+import { getSettingsBlobName } from '@/blobs';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -7,7 +8,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const body = await request.json();
     const parsedBody = SettingsSchema.parse(body);
 
-    const path = `trmnl-apple-photos-${parsedBody.uuid}-settings.json`;
+    const path = getSettingsBlobName(parsedBody.uuid);
 
     const blob = await put(path, JSON.stringify(parsedBody), {
       access: 'public',

@@ -80,7 +80,7 @@ export default async function Page({
     return <div>user_uuid is not a string</div>;
   }
 
-  const size = params.size ?? 'full'
+  const size = params.size ?? 'full';
 
   const settings = await getUserSettings(user_uuid);
   if (!settings) {

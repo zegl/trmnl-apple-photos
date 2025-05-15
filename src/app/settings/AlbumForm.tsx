@@ -73,54 +73,65 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '10px',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+      }}
+    >
       <h2>Album Settings</h2>
 
-    <p style={{
-      fontSize: '14px',
-      color: '#666',
-    }}>
-      To use this plugin, setup a public shared album in iCloud / Apple Photos. Enter the URL of the album below.
+      <p
+        style={{
+          fontSize: '14px',
+          color: '#666',
+        }}
+      >
+        To use this plugin, setup a public shared album in iCloud / Apple
+        Photos. Enter the URL of the album below.
       </p>
 
-      <form onSubmit={handleSubmit} style={{
+      <form
+        onSubmit={handleSubmit}
+        style={{
           display: 'flex',
           flexDirection: 'column',
           gap: '10px',
-        }}>
-        
-          <input
-            style={{
-              width: '100%',
-            }}
-            type="text"
-            id="sharedAlbumUrl"
-            name="sharedAlbumUrl"
-            value={sharedAlbumUrl}
-            onChange={onFormChange}
-            className="settings-input"
-            placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
-          />
+        }}
+      >
+        <input
+          style={{
+            width: '100%',
+          }}
+          type="text"
+          id="sharedAlbumUrl"
+          name="sharedAlbumUrl"
+          value={sharedAlbumUrl}
+          onChange={onFormChange}
+          className="settings-input"
+          placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
+        />
 
         {didSaveNewAlbum && (
-          <div style={{
-            color: 'darkgreen',
-            fontSize: '14px',
-          }}>
+          <div
+            style={{
+              color: 'darkgreen',
+              fontSize: '14px',
+            }}
+          >
             Album settings saved successfully! It make take a minute or two to
             process it.
           </div>
         )}
 
         {didChangeUrl && !isUrlValid && (
-          <div style={{
-            color: 'red',
-            fontSize: '14px',
-          }}>
+          <div
+            style={{
+              color: 'red',
+              fontSize: '14px',
+            }}
+          >
             The URL does not look like a valid shared album URL.
           </div>
         )}
@@ -128,12 +139,9 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
         {message && (
           <div className={`message ${message.type}`}>{message.text}</div>
         )}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Saving...' : 'Save Album'}
-          </button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving...' : 'Save Album'}
+        </button>
       </form>
     </div>
   );

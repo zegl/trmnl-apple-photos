@@ -20,16 +20,20 @@ export default async function Page({
   const settings = await getUserSettings(uuid);
 
   return (
-    <div className="screen" style={{
-      background: 'white',
-      
-    }}>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        width: '100%',
-      }}>
+    <div
+      className="screen"
+      style={{
+        background: 'white',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px',
+          width: '100%',
+        }}
+      >
         <div>
           <h1>Settings</h1>
           <p>Hello {user.user.name}, let's get you set up.</p>
