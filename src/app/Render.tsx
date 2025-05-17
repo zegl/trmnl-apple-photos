@@ -2,7 +2,7 @@ export default function Render({
   url,
   size,
   show_message,
-}: { url: string; size: string; show_message: string | undefined }) {
+}: { url: string; size: string; show_message?: string }) {
   return (
     <div
       className={`view view--${size}`}
