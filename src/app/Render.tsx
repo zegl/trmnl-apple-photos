@@ -1,14 +1,22 @@
-export default function Render({ url, size }: { url: string; size: string }) {
-    return (
-        <div
-          className={`view view--${size}`}
-          style={{
-            overflow: 'hidden',
-            justifyContent: 'center',
-          }}
-        >
+export default function Render({
+  url,
+  size,
+  show_message,
+}: { url: string; size: string; show_message: string | undefined }) {
+  return (
+    <div
+      className={`view view--${size}`}
+      style={{
+        overflow: 'hidden',
+        justifyContent: 'center',
+      }}
+    >
+      {show_message ? (
+        <div>{show_message}</div>
+      ) : (
+        <>
           <img src={url} alt="Photo" className="image-dither" />
-    
+
           <div
             style={{
               backdropFilter: 'grayscale(100%)',
@@ -21,6 +29,8 @@ export default function Render({ url, size }: { url: string; size: string }) {
               zIndex: 1,
             }}
           ></div>
-        </div>
-      );
+        </>
+      )}
+    </div>
+  );
 }

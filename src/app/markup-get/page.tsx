@@ -1,7 +1,6 @@
 import Render from '../Render';
 import { getPhotos } from '../photos';
 
-
 export default async function Page({
   searchParams,
 }: {
@@ -21,14 +20,13 @@ export default async function Page({
     return <div>size is not a string</div>;
   }
 
-  const photos = await getPhotos(user_uuid);
-  if (!photos.success) {
-    return <div className="screen">{photos.error}</div>;
+  const url = params.url;
+  if (typeof url !== 'string') {
+    return <div>url is not a string</div>;
   }
 
-  const { url } = photos.data;
+  const show_message =
+    typeof params.show_message === 'string' ? params.show_message : undefined;
 
-  console.log({ url, size, user_uuid }, "markup-get");
-
-  return <Render url={url} size={size} />;
+  return <Render url={url} size={size} show_message={show_message} />;
 }

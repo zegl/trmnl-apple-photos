@@ -25,7 +25,7 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-    watch
+    watch,
   } = useForm<FormValues>({
     defaultValues: {
       sharedAlbumUrl: initialSettings?.sharedAlbumUrl || '',
@@ -41,7 +41,9 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
   };
 
   const sharedAlbumUrl = watch('sharedAlbumUrl');
-  const isUrlValid = sharedAlbumUrl ? sharedAlbumUrlValidator(sharedAlbumUrl) === true : true;
+  const isUrlValid = sharedAlbumUrl
+    ? sharedAlbumUrlValidator(sharedAlbumUrl) === true
+    : true;
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
