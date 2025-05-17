@@ -7,7 +7,8 @@ export default function Render({
     <div
       className={`view view--${size}`}
       style={{
-        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
       }}
     >
@@ -15,7 +16,18 @@ export default function Render({
         <div>{show_message}</div>
       ) : (
         <>
-          <img src={url} alt="Photo" className="image-dither" />
+          <img
+            style={{
+              width: `calc(var(--${size}-w) - 6px)`,
+              height: `calc(var(--${size}-h) - 6px)`,
+              objectFit: 'cover',
+              objectPosition: 'center',
+              borderRadius: '6px',
+            }}
+            src={url}
+            alt="Photo"
+            className="image-dither"
+          />
 
           <div
             style={{
