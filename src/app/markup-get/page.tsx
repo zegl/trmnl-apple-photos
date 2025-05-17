@@ -28,5 +28,7 @@ export default async function Page({
 
   const { url } = photos.data;
 
+  console.log({ url, size, user_uuid }, "markup-get");
+
   return <Render url={url} size={size} />;
 }
