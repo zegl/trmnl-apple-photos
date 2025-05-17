@@ -28,5 +28,28 @@ export default async function Page({
 
   const { url } = photos.data;
 
-  return <Render url={url} size={size} />;
+  return <div style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    padding: '10px',
+  }}>
+    <p>Preview of the photo, in the different plugin sizes.</p>
+
+    <a href={`/settings?uuid=${user_uuid}`} className="button">
+      Settings
+    </a>
+
+    <h1>full</h1>
+    <Render url={url} size="full" />
+
+    <h1>half_vertical</h1>
+    <Render url={url} size="half_vertical" />
+
+    <h1>half_horizontal</h1>
+    <Render url={url} size="half_horizontal" />
+    
+    <h1>quadrant</h1>
+    <Render url={url} size="quadrant" />
+  </div>
 }

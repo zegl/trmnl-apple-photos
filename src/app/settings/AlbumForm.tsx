@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Settings } from './types';
 
 interface AlbumFormProps {
@@ -8,39 +9,48 @@ interface AlbumFormProps {
   initialSettings?: Settings;
 }
 
+interface FormValues {
+  sharedAlbumUrl: string;
+}
+
 export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
-  const [sharedAlbumUrl, setSharedAlbumUrl] = useState<string>(
-    initialSettings?.sharedAlbumUrl || ''
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
     type: 'success' | 'error';
   } | null>(null);
-
   const [didSaveNewAlbum, setDidSaveNewAlbum] = useState(false);
-  const [isUrlValid, setIsUrlValid] = useState(false);
-  const [didChangeUrl, setDidChangeUrl] = useState(false);
 
-  const validateSharedAlbumUrl = (url: string) => {
-    return url.includes('icloud.com/sharedalbum/#');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+    watch
+  } = useForm<FormValues>({
+    defaultValues: {
+      sharedAlbumUrl: initialSettings?.sharedAlbumUrl || '',
+    },
+  });
+
+  const sharedAlbumUrlValidator = (value: string): string | true => {
+    if (!value.includes('icloud.com/sharedalbum/#')) {
+      return 'Invalid shared album URL';
+    }
+
+    return true;
   };
 
-  const onFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSharedAlbumUrl(e.target.value);
-    setIsUrlValid(validateSharedAlbumUrl(e.target.value));
-    setDidChangeUrl(true);
-  };
+  const sharedAlbumUrl = watch('sharedAlbumUrl');
+  const isUrlValid = sharedAlbumUrl ? sharedAlbumUrlValidator(sharedAlbumUrl) === true : true;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     setMessage(null);
     setDidSaveNewAlbum(false);
 
     const settings: Settings = {
       uuid,
-      sharedAlbumUrl,
+      sharedAlbumUrl: data.sharedAlbumUrl,
     };
 
     try {
@@ -93,7 +103,7 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
       </p>
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -106,11 +116,11 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
           }}
           type="text"
           id="sharedAlbumUrl"
-          name="sharedAlbumUrl"
-          value={sharedAlbumUrl}
-          onChange={onFormChange}
-          className="settings-input"
           placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
+          className="settings-input"
+          {...register('sharedAlbumUrl', {
+            validate: sharedAlbumUrlValidator,
+          })}
         />
 
         {didSaveNewAlbum && (
@@ -125,7 +135,7 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
           </div>
         )}
 
-        {didChangeUrl && !isUrlValid && (
+        {isDirty && !isUrlValid && (
           <div
             style={{
               color: 'red',
@@ -143,6 +153,10 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
           {isSubmitting ? 'Saving...' : 'Save Album'}
         </button>
       </form>
+
+      <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
+        Preview
+      </a>
     </div>
   );
 }
