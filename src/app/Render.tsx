@@ -44,7 +44,7 @@ export default function Render({
             className="image-dither"
           /> */}
 
-          {/* <div
+          <div
             style={{
               backdropFilter: 'grayscale(100%)',
               backgroundColor: 'rgba(255, 255, 255, 0.0)',
@@ -55,7 +55,7 @@ export default function Render({
               left: 0,
               zIndex: 1,
             }}
-          ></div> */}
+          ></div>
         </>
       )}
     </div>
