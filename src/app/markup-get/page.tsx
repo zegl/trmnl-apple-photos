@@ -1,3 +1,4 @@
+import FullScreenMessage from '../FullScreenMessage';
 import Render from '../Render';
 import { getPhotos } from '../photos';
 
@@ -9,20 +10,20 @@ export default async function Page({
   const params = await searchParams;
   const user_uuid = params.user_uuid;
   if (!user_uuid) {
-    return <div className="screen">No user_uuid</div>;
+    return <FullScreenMessage message="Bad Request: No user_uuid" />;
   }
   if (typeof user_uuid !== 'string') {
-    return <div className="screen">user_uuid is not a string</div>;
+    return <FullScreenMessage message="Bad Request: user_uuid is not a string" />;
   }
 
   const size = params.size ?? 'full';
   if (typeof size !== 'string') {
-    return <div className="screen">size is not a string</div>;
+    return <FullScreenMessage message="Bad Request: size is not a string" />;
   }
 
   const url = params.url;
   if (typeof url !== 'string') {
-    return <div className="screen">url is not a string</div>;
+    return <FullScreenMessage message="Album has not been configured yet." />;
   }
 
   const show_message =
