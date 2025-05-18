@@ -45,7 +45,7 @@ export default async function Page({
         flexDirection: 'column',
         gap: '10px',
         padding: '10px',
-        background: 'white',
+        background: '#eee',
       }}
     >
       <p>
@@ -54,7 +54,7 @@ export default async function Page({
       </p>
 
       <a href={`/settings?uuid=${user_uuid}`} className="button">
-        Settings
+        Plugin Settings
       </a>
 
       <a href={backToTrmnlUrl} className="button">
@@ -62,16 +62,25 @@ export default async function Page({
       </a>
 
       <h1>full</h1>
-      <Render url={url} size="full" />
+
+      <div className="screen">
+        <Render url={url} size="full" />
+      </div>
 
       <h1>half_vertical</h1>
-      <Render url={url} size="half_vertical" />
+      <div className="screen">
+        <Render url={url} size="half_vertical" />
+      </div>
 
       <h1>half_horizontal</h1>
-      <Render url={url} size="half_horizontal" />
+      <div className="screen">
+        <Render url={url} size="half_horizontal" />
+      </div>
 
       <h1>quadrant</h1>
-      <Render url={url} size="quadrant" />
+      <div className="screen">
+        <Render url={url} size="quadrant" />
+      </div>
     </div>
   );
 }

@@ -181,7 +181,10 @@ export default function AlbumForm({
             }}
           >
             Album settings saved successfully! It make take a minute or two to
-            process it.
+            process it.{' '}
+            <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
+              Preview Album
+            </a>
           </div>
         )}
 
@@ -214,9 +217,11 @@ export default function AlbumForm({
           Back to TRMNL
         </a>
 
-        <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
-          Preview Album
-        </a>
+        {initialSettings?.sharedAlbumUrl && (
+          <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
+            Preview Album
+          </a>
+        )}
       </div>
     </div>
   );

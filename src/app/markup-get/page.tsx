@@ -13,7 +13,9 @@ export default async function Page({
     return <FullScreenMessage message="Bad Request: No user_uuid" />;
   }
   if (typeof user_uuid !== 'string') {
-    return <FullScreenMessage message="Bad Request: user_uuid is not a string" />;
+    return (
+      <FullScreenMessage message="Bad Request: user_uuid is not a string" />
+    );
   }
 
   const size = params.size ?? 'full';
