@@ -176,8 +176,27 @@ export const setUninstalledAt = async (uuid: string) => {
 };
 
 export const increaseRenderCount = async (uuid: string) => {
-  await supabase
+  // current count
+  const { data: currentCount, error: currentCountError } = await supabase
     .from('trmnl_apple_photos')
-    .update({ render_count: { _inc: 1 }, last_rendered_at: new Date() })
+    .select('render_count')
+    .eq('id', uuid)
+    .single();
+
+  if (currentCountError) {
+    console.error('Error fetching current render count', currentCountError);
+    return;
+  }
+
+  const newCount = currentCount.render_count + 1;
+
+  const { data, error } = await supabase
+    .from('trmnl_apple_photos')
+    .update({ render_count: newCount, last_render_at: new Date() })
     .eq('id', uuid);
+
+  if (error) {
+    console.error('Error increasing render count', error);
+    throw error;
+  }
 };

@@ -45,8 +45,6 @@ export async function POST(request: Request) {
     params.append('show_message', photos.error);
   }
 
-  console.log(params.toString(), 'markup');
-
   await increaseRenderCount(user_uuid);
 
   const res = await Promise.all(
