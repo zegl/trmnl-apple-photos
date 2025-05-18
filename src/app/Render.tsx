@@ -29,6 +29,7 @@ export default function Render({
               borderRadius: '6px',
               overflow: 'hidden',
             }}
+            className="image-dither"
           ></div>
           {/* <img
             style={{
