@@ -86,7 +86,7 @@ export const getPhotos = async (
   if (!settings) {
     return {
       success: false,
-      error: 'The album is not set up yet.',
+      error: 'The album has not been set up yet.',
     };
   }
 
@@ -96,7 +96,7 @@ export const getPhotos = async (
   if (webStream.photos.length === 0) {
     return {
       success: false,
-      error: 'No photos found in the shared album.',
+      error: 'No photos found in the shared album. :-/',
     };
   }
 

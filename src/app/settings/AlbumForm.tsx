@@ -2,18 +2,23 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Settings } from './types';
+import { Settings, UserBlob } from './types';
 
 interface AlbumFormProps {
   uuid: string;
   initialSettings?: Settings;
+  user: UserBlob;
 }
 
 interface FormValues {
   sharedAlbumUrl: string;
 }
 
-export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
+export default function AlbumForm({
+  uuid,
+  initialSettings,
+  user,
+}: AlbumFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
@@ -84,25 +89,50 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
     }
   };
 
+  const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.user.plugin_setting_id}/edit?force_refresh=true`;
+
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
+        height: '100%',
       }}
     >
       <h2>Album Settings</h2>
 
-      <p
+      <ol
         style={{
-          fontSize: '14px',
           color: '#666',
+          paddingLeft: '20px',
         }}
       >
-        To use this plugin, setup a public shared album in iCloud / Apple
-        Photos. Enter the URL of the album below.
-      </p>
+        <li>
+          <p>
+            Setup a "Shared Album" in iCloud / Apple Photos &mdash; How to:{' '}
+            <a href="https://support.apple.com/en-us/108314#createios">iOS</a> /{' '}
+            <a href="https://support.apple.com/en-us/108314#create-macos">
+              macOS
+            </a>
+            .
+          </p>
+        </li>
+        <li>
+          <p>
+            Create a "Public Website" for the shared album &mdash; How to:{' '}
+            <a href="https://support.apple.com/en-us/108314#invite-ios">iOS</a>{' '}
+            /{' '}
+            <a href="https://support.apple.com/en-us/108314#invite-macos">
+              macOS
+            </a>
+            .
+          </p>
+        </li>
+        <li>
+          <p>Copy the link to the albums website, and paste it below.</p>
+        </li>
+      </ol>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -112,18 +142,36 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
           gap: '10px',
         }}
       >
-        <input
+        <div
           style={{
-            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '10px',
           }}
-          type="text"
-          id="sharedAlbumUrl"
-          placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
-          className="settings-input"
-          {...register('sharedAlbumUrl', {
-            validate: sharedAlbumUrlValidator,
-          })}
-        />
+        >
+          <input
+            style={{
+              width: '100%',
+            }}
+            type="text"
+            id="sharedAlbumUrl"
+            placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
+            className="settings-input"
+            {...register('sharedAlbumUrl', {
+              validate: sharedAlbumUrlValidator,
+            })}
+          />
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            style={{
+              width: '100px',
+            }}
+          >
+            {isSubmitting ? 'Saving...' : 'Save Album'}
+          </button>
+        </div>
 
         {didSaveNewAlbum && (
           <div
@@ -151,14 +199,25 @@ export default function AlbumForm({ uuid, initialSettings }: AlbumFormProps) {
         {message && (
           <div className={`message ${message.type}`}>{message.text}</div>
         )}
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Save Album'}
-        </button>
       </form>
 
-      <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
-        Preview
-      </a>
+      <div style={{ flex: 1 }}></div>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '40px',
+        }}
+      >
+        <a href={backToTrmnlUrl} className="button">
+          Back to TRMNL
+        </a>
+
+        <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
+          Preview Album
+        </a>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { getUserBlob } from '@/blobs';
+import FullScreenMessage from '../FullScreenMessage';
 import Render from '../Render';
 import { getPhotos } from '../photos';
 
@@ -9,23 +11,32 @@ export default async function Page({
   const params = await searchParams;
   const user_uuid = params.user_uuid;
   if (!user_uuid) {
-    return <div>No user_uuid</div>;
+    return <FullScreenMessage message="Bad Request: No user_uuid" />;
   }
   if (typeof user_uuid !== 'string') {
-    return <div>user_uuid is not a string</div>;
+    return (
+      <FullScreenMessage message="Bad Request: user_uuid is not a string" />
+    );
   }
 
   const size = params.size ?? 'full';
   if (typeof size !== 'string') {
-    return <div>size is not a string</div>;
+    return <FullScreenMessage message="Bad Request: size is not a string" />;
+  }
+
+  const user = await getUserBlob(user_uuid);
+  if (!user) {
+    return <FullScreenMessage message="User not found :-(" />;
   }
 
   const photos = await getPhotos(user_uuid);
   if (!photos.success) {
-    return <div className="screen">{photos.error}</div>;
+    return <FullScreenMessage message={photos.error} />;
   }
 
   const { url } = photos.data;
+
+  const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.user.plugin_setting_id}/edit?force_refresh=true`;
 
   return (
     <div
@@ -34,12 +45,20 @@ export default async function Page({
         flexDirection: 'column',
         gap: '10px',
         padding: '10px',
+        background: 'white',
       }}
     >
-      <p>Preview of the photo, in the different plugin sizes.</p>
+      <p>
+        Preview of your album, in the different plugin sizes. Reload the page to
+        see a new picture.
+      </p>
 
       <a href={`/settings?uuid=${user_uuid}`} className="button">
         Settings
+      </a>
+
+      <a href={backToTrmnlUrl} className="button">
+        Back to TRMNL
       </a>
 
       <h1>full</h1>

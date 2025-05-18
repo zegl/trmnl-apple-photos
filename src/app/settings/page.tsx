@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { getUserBlob, getUserSettings } from '@/blobs';
 import AlbumForm from './AlbumForm';
+import FullScreenMessage from '../FullScreenMessage';
 
 export default async function Page({
   searchParams,
@@ -8,15 +9,18 @@ export default async function Page({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const uuid = (await searchParams).uuid;
-
   if (!uuid) {
-    return <div>No UUID</div>;
+    return <FullScreenMessage message="Bad Request: No UUID" />;
   }
   if (typeof uuid !== 'string') {
-    return <div>UUID is not a string</div>;
+    return <FullScreenMessage message="Bad Request: UUID is not a string" />;
   }
 
   const user = await getUserBlob(uuid);
+  if (!user) {
+    return <FullScreenMessage message="User not found :-(" />;
+  }
+
   const settings = await getUserSettings(uuid);
 
   return (
@@ -40,7 +44,7 @@ export default async function Page({
         </div>
 
         <Suspense fallback={<div>Loading...</div>}>
-          <AlbumForm uuid={uuid} initialSettings={settings} />
+          <AlbumForm uuid={uuid} initialSettings={settings} user={user} />
         </Suspense>
       </div>
     </div>

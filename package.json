@@ -13,6 +13,7 @@
     "lint:biome:fix": "biome check --apply ."
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
     "@vercel/blob": "^1.0.1",
     "@vercel/edge-config": "^1.4.0",
     "next": "15.3.2",
