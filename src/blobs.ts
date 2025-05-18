@@ -18,11 +18,14 @@ export const getSettingsBlobName = (uuid: string) => {
 
 export const getUserBlobFromVercel = async (
   uuid: string
-): Promise<UserBlob> => {
+): Promise<UserBlob | undefined> => {
   try {
     const path = getUserBlobName(uuid);
     const url = baseUrl + path;
     const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+      return undefined;
+    }
     const data = await response.json();
     return UserBlobSchema.parse(data);
   } catch (error) {
@@ -159,7 +162,10 @@ export const getUserSettings = async (
 export const saveUserSettings = async (uuid: string, settings: Settings) => {
   await supabase
     .from('trmnl_apple_photos')
-    .upsert({ id: uuid, settings, updated_settings_at: new Date() }, { onConflict: 'id' });
+    .upsert(
+      { id: uuid, settings, updated_settings_at: new Date() },
+      { onConflict: 'id' }
+    );
 };
 
 export const setUninstalledAt = async (uuid: string) => {
