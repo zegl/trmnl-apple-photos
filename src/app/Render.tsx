@@ -10,26 +10,41 @@ export default function Render({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+
+        padding: size === 'full' ? '0px' : '3px',
       }}
     >
       {show_message ? (
         <div>{show_message}</div>
       ) : (
         <>
-          <img
+          <div
             style={{
-              width: `calc(var(--${size}-w) - 6px)`,
-              height: `calc(var(--${size}-h) - 6px)`,
-              objectFit: 'cover',
-              objectPosition: 'center',
+              background: `url(${url})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              width: '100%',
+              height: '100%',
+              borderRadius: '6px',
+              overflow: 'hidden',
+            }}
+          ></div>
+          {/* <img
+            style={{
+              // width: `calc(var(--${size}-w) - 6px)`,
+              // height: `calc(var(--${size}-h) - 6px)`,
+              padding: '3px',
+              // objectFit: 'cover',
+              // objectPosition: 'center',
               borderRadius: '6px',
             }}
             src={url}
             alt="Photo"
             className="image-dither"
-          />
+          /> */}
 
-          <div
+          {/* <div
             style={{
               backdropFilter: 'grayscale(100%)',
               backgroundColor: 'rgba(255, 255, 255, 0.0)',
@@ -40,7 +55,7 @@ export default function Render({
               left: 0,
               zIndex: 1,
             }}
-          ></div>
+          ></div> */}
         </>
       )}
     </div>

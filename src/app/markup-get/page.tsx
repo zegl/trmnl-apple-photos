@@ -9,20 +9,20 @@ export default async function Page({
   const params = await searchParams;
   const user_uuid = params.user_uuid;
   if (!user_uuid) {
-    return <div>No user_uuid</div>;
+    return <div className="screen">No user_uuid</div>;
   }
   if (typeof user_uuid !== 'string') {
-    return <div>user_uuid is not a string</div>;
+    return <div className="screen">user_uuid is not a string</div>;
   }
 
   const size = params.size ?? 'full';
   if (typeof size !== 'string') {
-    return <div>size is not a string</div>;
+    return <div className="screen">size is not a string</div>;
   }
 
   const url = params.url;
   if (typeof url !== 'string') {
-    return <div>url is not a string</div>;
+    return <div className="screen">url is not a string</div>;
   }
 
   const show_message =

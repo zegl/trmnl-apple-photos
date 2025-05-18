@@ -121,3 +121,53 @@ export const getPhotos = async (
     },
   };
 };
+
+export const getAllUrls = async (
+  user_uuid: string
+): Promise<
+  Result<{
+    urls: string[];
+  }>
+> => {
+  const settings = await getUserSettings(user_uuid);
+  if (!settings) {
+    return {
+      success: false,
+      error: 'The album is not set up yet.',
+    };
+  }
+
+  const albumId = getAlbumId(settings.sharedAlbumUrl);
+  const webStream = await fetchWebStream(albumId);
+
+  if (webStream.photos.length === 0) {
+    return {
+      success: false,
+      error: 'No photos found in the shared album.',
+    };
+  }
+
+  const urls = [];
+
+  for (const photo of webStream.photos) {
+    const webAsset = await fetchWebAsset(albumId, photo.photoGuid);
+
+    // Largest derivative
+    const largestDerivative = Object.values(photo.derivatives).reduce(
+      (a, b) => {
+        return parseInt(a.width) > parseInt(b.width) ? a : b;
+      }
+    );
+
+    const item = webAsset.items[largestDerivative.checksum];
+    const url = `https://${item.url_location}${item.url_path}`;
+    urls.push(url);
+  }
+
+  return {
+    success: true,
+    data: {
+      urls,
+    },
+  };
+};
