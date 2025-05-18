@@ -159,12 +159,19 @@ export const getUserSettings = async (
 export const saveUserSettings = async (uuid: string, settings: Settings) => {
   await supabase
     .from('trmnl_apple_photos')
-    .upsert({ id: uuid, settings }, { onConflict: 'id' });
+    .upsert({ id: uuid, settings, updated_settings_at: new Date() }, { onConflict: 'id' });
 };
 
 export const setUninstalledAt = async (uuid: string) => {
   await supabase
     .from('trmnl_apple_photos')
     .update({ uninstalled_at: new Date() })
+    .eq('id', uuid);
+};
+
+export const increaseRenderCount = async (uuid: string) => {
+  await supabase
+    .from('trmnl_apple_photos')
+    .update({ render_count: { _inc: 1 }, last_rendered_at: new Date() })
     .eq('id', uuid);
 };

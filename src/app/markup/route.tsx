@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPhotos } from '../photos';
+import { increaseRenderCount } from '@/blobs';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -45,6 +46,8 @@ export async function POST(request: Request) {
   }
 
   console.log(params.toString(), 'markup');
+
+  await increaseRenderCount(user_uuid);
 
   const res = await Promise.all(
     sizes.map(async (size) => {
