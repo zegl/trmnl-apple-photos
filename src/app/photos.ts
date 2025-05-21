@@ -1,5 +1,9 @@
 import { getUserSettings } from '@/blobs';
-import { fetchPublicAlbumWebAsset, fetchPublicAlbumWebStream, getPublicAlbumId } from './apple-public-album';
+import {
+  fetchPublicAlbumWebAsset,
+  fetchPublicAlbumWebStream,
+  getPublicAlbumId,
+} from './apple-public-album';
 
 type Result<T> =
   | {
@@ -28,7 +32,10 @@ export const getPhotos = async (
 
   const albumId = getPublicAlbumId(settings.sharedAlbumUrl);
 
-  const {webStream, partition} = await fetchPublicAlbumWebStream("p123", albumId);
+  const { webStream, partition } = await fetchPublicAlbumWebStream(
+    'p123',
+    albumId
+  );
 
   if (webStream.photos.length === 0) {
     return {
@@ -41,7 +48,11 @@ export const getPhotos = async (
 
   const photo = webStream.photos[randomIndex];
 
-  const webAsset = await fetchPublicAlbumWebAsset(partition, albumId, photo.photoGuid);
+  const webAsset = await fetchPublicAlbumWebAsset(
+    partition,
+    albumId,
+    photo.photoGuid
+  );
 
   // Largest derivative
   const largestDerivative = Object.values(photo.derivatives).reduce((a, b) => {
