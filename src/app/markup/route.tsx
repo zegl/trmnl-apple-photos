@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getPhotos } from '../photos';
-import { increaseRenderCount } from '@/blobs';
+import { BlobRepository } from '@/blobs';
+import { getSupabaseClientForUser } from '@/supabase';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -36,7 +37,9 @@ export async function POST(request: Request) {
   const params = new URLSearchParams();
   params.append('user_uuid', user_uuid);
 
-  const photos = await getPhotos(user_uuid);
+  const supabaseClient = getSupabaseClientForUser(user_uuid);
+  const blobRepository = new BlobRepository(supabaseClient);
+  const photos = await getPhotos({ blobRepository, user_uuid });
 
   if (photos.success) {
     const { url } = photos.data;
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
     params.append('show_message', photos.error);
   }
 
-  await increaseRenderCount(user_uuid);
+  await blobRepository.increaseRenderCount(user_uuid);
 
   const res = await Promise.all(
     sizes.map(async (size) => {
@@ -68,7 +71,7 @@ export async function POST(request: Request) {
     })
   );
 
-  let json: Record<string, string> = {};
+  const json: Record<string, string> = {};
   for (const size of res) {
     json[size.json_name] = size.markup;
   }

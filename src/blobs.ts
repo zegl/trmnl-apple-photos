@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   type PublicAlbumWebStream,
   webStreamSchema,
@@ -9,301 +10,199 @@ import {
   type UserBlob,
 } from './app/settings/types';
 import type { Result } from './result';
-import { supabase } from './supabase';
 
-const baseUrl = 'https://2yaxofh7gqnbsbms.public.blob.vercel-storage.com/';
 
 const applePhotosTableName = 'trmnl_apple_photos';
 
-export const getUserBlobName = (uuid: string) => {
-  return `trmnl-apple-photos-${uuid}-user.json`;
-};
+// const applePhotosTableName = 'trmnl_apple_photos_duplicate_dev';
 
-export const getSettingsBlobName = (uuid: string) => {
-  return `trmnl-apple-photos-${uuid}-settings.json`;
-};
+export class BlobRepository {
+  constructor(private readonly supabaseClient: SupabaseClient) {}
 
-export const getUserBlobFromVercel = async (
-  uuid: string
-): Promise<UserBlob | undefined> => {
-  try {
-    const path = getUserBlobName(uuid);
-    const url = baseUrl + path;
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) {
+  getUserBlob = async (uuid: string): Promise<UserBlob | undefined> => {
+    try {
+      const { data, error } = await this.supabaseClient
+        .from(applePhotosTableName)
+        .select('user')
+        .eq('id', uuid)
+        .single();
+
+      if (error) {
+        console.error('Error fetching from Supabase:', error);
+        throw error;
+      }
+
+      return UserBlobSchema.parse(data.user);
+    } catch (error) {
+      // On not found, fallback to legacy implementation
+      console.error('Error getting user blob from Supabase', error);
       return undefined;
     }
-    const data = await response.json();
-    return UserBlobSchema.parse(data);
-  } catch (error) {
-    console.error('Error getting user blob', error);
-    throw error;
-  }
-};
+  };
 
-const migrateUserBlobFromVercel = async (
-  uuid: string
-): Promise<UserBlob | undefined> => {
-  const vercelBlob = await getUserBlobFromVercel(uuid);
-  if (!vercelBlob) {
-    return;
-  }
-
-  await supabase
-    .from(applePhotosTableName)
-    .upsert({ id: uuid, user: vercelBlob }, { onConflict: 'id' });
-
-  return vercelBlob;
-};
-
-export const getUserBlob = async (
-  uuid: string
-): Promise<UserBlob | undefined> => {
-  try {
-    const { data, error } = await supabase
+  saveUserBlob = async (uuid: string, user: UserBlob) => {
+    await this.supabaseClient
       .from(applePhotosTableName)
-      .select('user')
-      .eq('id', uuid)
-      .single();
+      .upsert({ id: uuid, user }, { onConflict: 'id' });
+  };
 
-    if (error) {
-      console.error('Error fetching from Supabase:', error);
-      throw error;
-    }
+  getUserSettings = async (uuid: string): Promise<Settings | undefined> => {
+    try {
+      const { data, error } = await this.supabaseClient
+        .from(applePhotosTableName)
+        .select('settings')
+        .eq('id', uuid)
+        .single();
 
-    if (!data.user) {
-      return migrateUserBlobFromVercel(uuid);
-    }
+      if (error) {
+        console.error('Error fetching from Supabase:', error);
+        throw error;
+      }
 
-    return UserBlobSchema.parse(data.user);
-  } catch (error) {
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      'code' in error &&
-      error.code === 'PGRST116'
-    ) {
-      return migrateUserBlobFromVercel(uuid);
-    }
-
-    // On not found, fallback to legacy implementation
-    console.error('Error getting user blob from Supabase', error);
-    // throw error;
-    return undefined;
-  }
-};
-
-export const saveUserBlob = async (uuid: string, user: UserBlob) => {
-  await supabase
-    .from(applePhotosTableName)
-    .upsert({ id: uuid, user }, { onConflict: 'id' });
-};
-
-export const getUserSettingsFromVercel = async (
-  uuid: string
-): Promise<Settings | undefined> => {
-  try {
-    const path = getSettingsBlobName(uuid);
-    const url = baseUrl + path;
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) {
+      return SettingsSchema.parse(data.settings);
+    } catch (error) {
+      console.error('Error getting user settings from Supabase', error);
       return undefined;
     }
-    const data = await response.json();
-    return SettingsSchema.parse(data);
-  } catch (error) {
-    return undefined;
-  }
-};
+  };
 
-const migrateSettingsFromVercel = async (
-  uuid: string
-): Promise<Settings | undefined> => {
-  const vercelSettings = await getUserSettingsFromVercel(uuid);
-  if (!vercelSettings) {
-    return;
-  }
-
-  await supabase
-    .from(applePhotosTableName)
-    .upsert({ id: uuid, settings: vercelSettings }, { onConflict: 'id' });
-
-  return vercelSettings;
-};
-
-export const getUserSettings = async (
-  uuid: string
-): Promise<Settings | undefined> => {
-  try {
-    const { data, error } = await supabase
+  saveUserSettings = async (uuid: string, settings: Settings) => {
+    await this.supabaseClient
       .from(applePhotosTableName)
-      .select('settings')
-      .eq('id', uuid)
-      .single();
+      .upsert(
+        { id: uuid, settings, updated_settings_at: new Date() },
+        { onConflict: 'id' }
+      );
+  };
+
+  setUninstalledAt = async (uuid: string) => {
+    await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ uninstalled_at: new Date() })
+      .eq('id', uuid);
+  };
+
+  increaseRenderCount = async (uuid: string) => {
+    // current count
+    const { data: currentCount, error: currentCountError } =
+      await this.supabaseClient
+        .from(applePhotosTableName)
+        .select('render_count')
+        .eq('id', uuid)
+        .single();
+
+    if (currentCountError) {
+      console.error('Error fetching current render count', currentCountError);
+      return;
+    }
+
+    const newCount = currentCount.render_count + 1;
+
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ render_count: newCount, last_render_at: new Date() })
+      .eq('id', uuid);
 
     if (error) {
-      console.error('Error fetching from Supabase:', error);
+      console.error('Error increasing render count', error);
       throw error;
     }
+  };
 
-    if (!data.settings) {
-      return migrateSettingsFromVercel(uuid);
-    }
-
-    return SettingsSchema.parse(data.settings);
-  } catch (error) {
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      'code' in error &&
-      error.code === 'PGRST116'
-    ) {
-      return migrateSettingsFromVercel(uuid);
-    }
-
-    console.error('Error getting user settings from Supabase', error);
-    return undefined;
-  }
-};
-
-export const saveUserSettings = async (uuid: string, settings: Settings) => {
-  await supabase
-    .from(applePhotosTableName)
-    .upsert(
-      { id: uuid, settings, updated_settings_at: new Date() },
-      { onConflict: 'id' }
-    );
-};
-
-export const setUninstalledAt = async (uuid: string) => {
-  await supabase
-    .from(applePhotosTableName)
-    .update({ uninstalled_at: new Date() })
-    .eq('id', uuid);
-};
-
-export const increaseRenderCount = async (uuid: string) => {
-  // current count
-  const { data: currentCount, error: currentCountError } = await supabase
-    .from(applePhotosTableName)
-    .select('render_count')
-    .eq('id', uuid)
-    .single();
-
-  if (currentCountError) {
-    console.error('Error fetching current render count', currentCountError);
-    return;
-  }
-
-  const newCount = currentCount.render_count + 1;
-
-  const { data, error } = await supabase
-    .from(applePhotosTableName)
-    .update({ render_count: newCount, last_render_at: new Date() })
-    .eq('id', uuid);
-
-  if (error) {
-    console.error('Error increasing render count', error);
-    throw error;
-  }
-};
-
-export const setPartitionAndWebStream = async ({
-  uuid,
-  apple_partition,
-  web_stream_blob,
-}: {
-  uuid: string;
-  apple_partition: string;
-  web_stream_blob: PublicAlbumWebStream;
-}) => {
-  const { error } = await supabase
-    .from(applePhotosTableName)
-    .update({
-      apple_partition,
-      web_stream_blob,
-      web_stream_blob_fetched_at: new Date(),
-    })
-    .eq('id', uuid);
-
-  if (error) {
-    console.error('Error setting partition and web stream', error);
-    throw error;
-  }
-};
-
-export const getPartitionAndWebStream = async (
-  uuid: string
-): Promise<
-  Result<{
-    apple_partition: string | undefined;
+  setPartitionAndWebStream = async ({
+    uuid,
+    apple_partition,
+    web_stream_blob,
+  }: {
+    uuid: string;
+    apple_partition: string;
     web_stream_blob: PublicAlbumWebStream;
-    web_stream_blob_fetched_at: Date | undefined;
-  }>
-> => {
-  const { data, error } = await supabase
-    .from(applePhotosTableName)
-    .select('apple_partition, web_stream_blob, web_stream_blob_fetched_at')
-    .eq('id', uuid)
-    .single();
+  }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({
+        apple_partition,
+        web_stream_blob,
+        web_stream_blob_fetched_at: new Date(),
+      })
+      .eq('id', uuid);
 
-  if (error) {
-    return {
-      success: false,
-      error: error.message,
-    };
-  }
-
-  const parsed = webStreamSchema.safeParse(data.web_stream_blob);
-
-  if (!parsed.success) {
-    return {
-      success: false,
-      error: parsed.error.message,
-    };
-  }
-
-  return {
-    success: true,
-    data: {
-      apple_partition: data.apple_partition,
-      web_stream_blob: parsed.data,
-      web_stream_blob_fetched_at: data.web_stream_blob_fetched_at,
-    },
+    if (error) {
+      console.error('Error setting partition and web stream', error);
+      throw error;
+    }
   };
-};
 
-export const setLastUsedUrl = async ({
-  uuid,
-  url,
-}: { uuid: string; url: string }) => {
-  const { error } = await supabase
-    .from(applePhotosTableName)
-    .update({ last_used_url: url, last_used_url_updated_at: new Date() })
-    .eq('id', uuid);
+  getPartitionAndWebStream = async (
+    uuid: string
+  ): Promise<
+    Result<{
+      apple_partition: string | undefined;
+      web_stream_blob: PublicAlbumWebStream;
+      web_stream_blob_fetched_at: Date | undefined;
+    }>
+  > => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('apple_partition, web_stream_blob, web_stream_blob_fetched_at')
+      .eq('id', uuid)
+      .single();
 
-  if (error) {
-    console.error('Error setting last used url', error);
-    throw error;
-  }
-};
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
 
-export const getLastUsedUrl = async (uuid: string): Promise<Result<string>> => {
-  const { data, error } = await supabase
-    .from(applePhotosTableName)
-    .select('last_used_url')
-    .eq('id', uuid)
-    .single();
+    const parsed = webStreamSchema.safeParse(data.web_stream_blob);
 
-  if (error) {
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.message,
+      };
+    }
+
     return {
-      success: false,
-      error: error.message,
+      success: true,
+      data: {
+        apple_partition: data.apple_partition,
+        web_stream_blob: parsed.data,
+        web_stream_blob_fetched_at: data.web_stream_blob_fetched_at,
+      },
     };
-  }
-
-  return {
-    success: true,
-    data: data.last_used_url,
   };
-};
+
+  setLastUsedUrl = async ({ uuid, url }: { uuid: string; url: string }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ last_used_url: url, last_used_url_updated_at: new Date() })
+      .eq('id', uuid);
+
+    if (error) {
+      console.error('Error setting last used url', error);
+      throw error;
+    }
+  };
+
+  getLastUsedUrl = async (uuid: string): Promise<Result<string>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('last_used_url')
+      .eq('id', uuid)
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: data.last_used_url,
+    };
+  };
+}

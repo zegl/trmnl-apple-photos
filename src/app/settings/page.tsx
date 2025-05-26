@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
-import { getUserBlob, getUserSettings } from '@/blobs';
+import { BlobRepository } from '@/blobs';
 import AlbumForm from './AlbumForm';
 import FullScreenMessage from '../FullScreenMessage';
+import { getSupabaseClientForUser } from '@/supabase';
 
 export default async function Page({
   searchParams,
@@ -16,12 +17,15 @@ export default async function Page({
     return <FullScreenMessage message="Bad Request: UUID is not a string" />;
   }
 
-  const user = await getUserBlob(uuid);
+  const supabaseClient = getSupabaseClientForUser(uuid);
+  const blobRepository = new BlobRepository(supabaseClient);
+
+  const user = await blobRepository.getUserBlob(uuid);
   if (!user) {
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  const settings = await getUserSettings(uuid);
+  const settings = await blobRepository.getUserSettings(uuid);
 
   return (
     <div

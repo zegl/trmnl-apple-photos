@@ -1,7 +1,8 @@
-import { getUserBlob } from '@/blobs';
+import { BlobRepository } from '@/blobs';
 import FullScreenMessage from '../FullScreenMessage';
 import Render from '../Render';
 import { getPhotos } from '../photos';
+import { getSupabaseClientForUser } from '@/supabase';
 
 export default async function Page({
   searchParams,
@@ -24,12 +25,15 @@ export default async function Page({
     return <FullScreenMessage message="Bad Request: size is not a string" />;
   }
 
-  const user = await getUserBlob(user_uuid);
+  const supabaseClient = getSupabaseClientForUser(user_uuid);
+  const blobRepository = new BlobRepository(supabaseClient);
+
+  const user = await blobRepository.getUserBlob(user_uuid);
   if (!user) {
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  const photos = await getPhotos(user_uuid);
+  const photos = await getPhotos({ blobRepository, user_uuid });
   if (!photos.success) {
     return <FullScreenMessage message={photos.error} />;
   }

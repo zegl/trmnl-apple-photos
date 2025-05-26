@@ -1,11 +1,14 @@
-import { put } from '@vercel/blob';
-import { getUserBlobName, saveUserBlob, saveUserSettings } from '@/blobs';
+import { BlobRepository } from '@/blobs';
 import { NextResponse } from 'next/server';
+import { getSupabaseClientForUser } from '@/supabase';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = await request.json();
 
-  await saveUserBlob(body.user.uuid, body);
+  const supabaseClient = getSupabaseClientForUser(body.user.uuid);
+  const blobRepository = new BlobRepository(supabaseClient);
+
+  await blobRepository.saveUserBlob(body.user.uuid, body);
 
   console.log('Installed user', body.user.uuid);
 

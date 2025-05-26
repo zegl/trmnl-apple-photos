@@ -1,14 +1,17 @@
 import { SettingsSchema } from '@/app/settings/types';
-import { put } from '@vercel/blob';
-import { getSettingsBlobName, saveUserSettings } from '@/blobs';
+import { BlobRepository } from '@/blobs';
 import { NextResponse } from 'next/server';
+import { getSupabaseClientForUser } from '@/supabase';
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
     const parsedBody = SettingsSchema.parse(body);
 
-    await saveUserSettings(parsedBody.uuid, parsedBody);
+    const supabaseClient = getSupabaseClientForUser(parsedBody.uuid);
+    const blobRepository = new BlobRepository(supabaseClient);
+
+    await blobRepository.saveUserSettings(parsedBody.uuid, parsedBody);
 
     return NextResponse.json({
       status: 'success',

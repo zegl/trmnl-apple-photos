@@ -1,10 +1,4 @@
-import {
-  getLastUsedUrl,
-  getPartitionAndWebStream,
-  getUserSettings,
-  setLastUsedUrl,
-  setPartitionAndWebStream,
-} from '@/blobs';
+import type { BlobRepository } from '@/blobs';
 import {
   fetchPublicAlbumWebAsset,
   fetchPublicAlbumWebStream,
@@ -18,11 +12,16 @@ type ImageResult = Result<{
 }>;
 
 const tryCrawlNewImage = async ({
+  blobRepository,
   user_uuid,
   settings,
-}: { user_uuid: string; settings: Settings }): Promise<ImageResult> => {
+}: {
+  blobRepository: BlobRepository;
+  user_uuid: string;
+  settings: Settings;
+}): Promise<ImageResult> => {
   const getPartitionAndWebStreamResult =
-    await getPartitionAndWebStream(user_uuid);
+    await blobRepository.getPartitionAndWebStream(user_uuid);
   let request_partition = 'p123';
   if (
     getPartitionAndWebStreamResult.success &&
@@ -38,7 +37,7 @@ const tryCrawlNewImage = async ({
     albumId
   );
 
-  await setPartitionAndWebStream({
+  await blobRepository.setPartitionAndWebStream({
     uuid: user_uuid,
     apple_partition: partition,
     web_stream_blob: webStream,
@@ -77,8 +76,14 @@ const tryCrawlNewImage = async ({
   };
 };
 
-export const getPhotos = async (user_uuid: string): Promise<ImageResult> => {
-  const settings = await getUserSettings(user_uuid);
+export const getPhotos = async ({
+  blobRepository,
+  user_uuid,
+}: {
+  blobRepository: BlobRepository;
+  user_uuid: string;
+}): Promise<ImageResult> => {
+  const settings = await blobRepository.getUserSettings(user_uuid);
   if (!settings) {
     return {
       success: false,
@@ -87,11 +92,12 @@ export const getPhotos = async (user_uuid: string): Promise<ImageResult> => {
   }
 
   const tryCrawlNewImageResult = await tryCrawlNewImage({
+    blobRepository,
     user_uuid,
     settings,
   });
   if (tryCrawlNewImageResult.success) {
-    await setLastUsedUrl({
+    await blobRepository.setLastUsedUrl({
       uuid: user_uuid,
       url: tryCrawlNewImageResult.data.url,
     });
@@ -99,7 +105,7 @@ export const getPhotos = async (user_uuid: string): Promise<ImageResult> => {
   }
 
   // Fallback to last used url if crawl fails
-  const lastUsedUrlResult = await getLastUsedUrl(user_uuid);
+  const lastUsedUrlResult = await blobRepository.getLastUsedUrl(user_uuid);
   if (lastUsedUrlResult.success) {
     return {
       success: true,
