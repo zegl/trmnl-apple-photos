@@ -13,6 +13,14 @@ export default function Home() {
             </a>
             .
           </div>
+
+          <div className="text--black" style={{ marginTop: '20px' }}>
+            Like this plugin? Please consider <a style={{ textDecoration: 'underline' }} href="https://polar.sh/checkout/polar_c_nDQaEaCrajSTvlrMmJsbkyoNjCe3hLbaUxAXt1nHgem">donating</a> to support it's development. 🖤
+          </div>
+
+          <div className="text--black" style={{ marginTop: '20px' }}>
+            Bugs? <a style={{ textDecoration: 'underline' }} href="https://github.com/zegl/trmnl-apple-photos">Open an issue on GitHub</a>
+          </div>
         </div>
 
         <div className="title_bar">
