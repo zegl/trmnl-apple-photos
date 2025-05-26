@@ -5,7 +5,7 @@ export const getPublicAlbumId = (sharedAlbumUrl: string) => {
   return albumId;
 };
 
-const webStreamSchema = z.object({
+export const webStreamSchema = z.object({
   streamName: z.string(),
   photos: z.array(
     z.object({
@@ -37,7 +37,7 @@ const webStreamOrRedirectSchema = z.union([
   webStreamRedirectSchema,
 ]);
 
-type PublicAlbumWebStream = z.infer<typeof webStreamSchema>;
+export type PublicAlbumWebStream = z.infer<typeof webStreamSchema>;
 
 export const fetchPublicAlbumWebStream = async (
   partition: string,
@@ -61,7 +61,7 @@ export const fetchPublicAlbumWebStream = async (
   return { webStream: result, partition: partition };
 };
 
-const publicAlbumWebAssetSchema = z.object({
+export const publicAlbumWebAssetSchema = z.object({
   items: z.record(
     z.string(),
     z.object({

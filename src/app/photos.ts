@@ -1,41 +1,48 @@
-import { getUserSettings } from '@/blobs';
+import {
+  getLastUsedUrl,
+  getPartitionAndWebStream,
+  getUserSettings,
+  setLastUsedUrl,
+  setPartitionAndWebStream,
+} from '@/blobs';
 import {
   fetchPublicAlbumWebAsset,
   fetchPublicAlbumWebStream,
   getPublicAlbumId,
 } from './apple-public-album';
+import type { Result } from '@/result';
+import type { Settings } from './settings/types';
 
-type Result<T> =
-  | {
-      success: true;
-      data: T;
-    }
-  | {
-      success: false;
-      error: string;
-    };
+type ImageResult = Result<{
+  url: string;
+}>;
 
-export const getPhotos = async (
-  user_uuid: string
-): Promise<
-  Result<{
-    url: string;
-  }>
-> => {
-  const settings = await getUserSettings(user_uuid);
-  if (!settings) {
-    return {
-      success: false,
-      error: 'The album has not been set up yet.',
-    };
+const tryCrawlNewImage = async ({
+  user_uuid,
+  settings,
+}: { user_uuid: string; settings: Settings }): Promise<ImageResult> => {
+  const getPartitionAndWebStreamResult =
+    await getPartitionAndWebStream(user_uuid);
+  let request_partition = 'p123';
+  if (
+    getPartitionAndWebStreamResult.success &&
+    getPartitionAndWebStreamResult.data.apple_partition
+  ) {
+    request_partition = getPartitionAndWebStreamResult.data.apple_partition;
   }
 
   const albumId = getPublicAlbumId(settings.sharedAlbumUrl);
 
   const { webStream, partition } = await fetchPublicAlbumWebStream(
-    'p123',
+    request_partition,
     albumId
   );
+
+  await setPartitionAndWebStream({
+    uuid: user_uuid,
+    apple_partition: partition,
+    web_stream_blob: webStream,
+  });
 
   if (webStream.photos.length === 0) {
     return {
@@ -67,5 +74,44 @@ export const getPhotos = async (
     data: {
       url,
     },
+  };
+};
+
+export const getPhotos = async (user_uuid: string): Promise<ImageResult> => {
+  const settings = await getUserSettings(user_uuid);
+  if (!settings) {
+    return {
+      success: false,
+      error: 'The album has not been set up yet.',
+    };
+  }
+
+  const tryCrawlNewImageResult = await tryCrawlNewImage({
+    user_uuid,
+    settings,
+  });
+  if (tryCrawlNewImageResult.success) {
+    await setLastUsedUrl({
+      uuid: user_uuid,
+      url: tryCrawlNewImageResult.data.url,
+    });
+    return tryCrawlNewImageResult;
+  }
+
+  // Fallback to last used url if crawl fails
+  const lastUsedUrlResult = await getLastUsedUrl(user_uuid);
+  if (lastUsedUrlResult.success) {
+    return {
+      success: true,
+      data: {
+        url: lastUsedUrlResult.data,
+      },
+    };
+  }
+
+  // Crawl failed and no last used url
+  return {
+    success: false,
+    error: 'Fetching photos failed. :-(',
   };
 };

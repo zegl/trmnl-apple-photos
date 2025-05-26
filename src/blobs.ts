@@ -1,12 +1,19 @@
 import {
+  type PublicAlbumWebStream,
+  webStreamSchema,
+} from './app/apple-public-album';
+import {
   SettingsSchema,
-  Settings,
+  type Settings,
   UserBlobSchema,
-  UserBlob,
+  type UserBlob,
 } from './app/settings/types';
+import type { Result } from './result';
 import { supabase } from './supabase';
 
 const baseUrl = 'https://2yaxofh7gqnbsbms.public.blob.vercel-storage.com/';
+
+const applePhotosTableName = 'trmnl_apple_photos';
 
 export const getUserBlobName = (uuid: string) => {
   return `trmnl-apple-photos-${uuid}-user.json`;
@@ -43,7 +50,7 @@ const migrateUserBlobFromVercel = async (
   }
 
   await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .upsert({ id: uuid, user: vercelBlob }, { onConflict: 'id' });
 
   return vercelBlob;
@@ -54,7 +61,7 @@ export const getUserBlob = async (
 ): Promise<UserBlob | undefined> => {
   try {
     const { data, error } = await supabase
-      .from('trmnl_apple_photos')
+      .from(applePhotosTableName)
       .select('user')
       .eq('id', uuid)
       .single();
@@ -88,7 +95,7 @@ export const getUserBlob = async (
 
 export const saveUserBlob = async (uuid: string, user: UserBlob) => {
   await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .upsert({ id: uuid, user }, { onConflict: 'id' });
 };
 
@@ -118,7 +125,7 @@ const migrateSettingsFromVercel = async (
   }
 
   await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .upsert({ id: uuid, settings: vercelSettings }, { onConflict: 'id' });
 
   return vercelSettings;
@@ -129,7 +136,7 @@ export const getUserSettings = async (
 ): Promise<Settings | undefined> => {
   try {
     const { data, error } = await supabase
-      .from('trmnl_apple_photos')
+      .from(applePhotosTableName)
       .select('settings')
       .eq('id', uuid)
       .single();
@@ -161,7 +168,7 @@ export const getUserSettings = async (
 
 export const saveUserSettings = async (uuid: string, settings: Settings) => {
   await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .upsert(
       { id: uuid, settings, updated_settings_at: new Date() },
       { onConflict: 'id' }
@@ -170,7 +177,7 @@ export const saveUserSettings = async (uuid: string, settings: Settings) => {
 
 export const setUninstalledAt = async (uuid: string) => {
   await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .update({ uninstalled_at: new Date() })
     .eq('id', uuid);
 };
@@ -178,7 +185,7 @@ export const setUninstalledAt = async (uuid: string) => {
 export const increaseRenderCount = async (uuid: string) => {
   // current count
   const { data: currentCount, error: currentCountError } = await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .select('render_count')
     .eq('id', uuid)
     .single();
@@ -191,7 +198,7 @@ export const increaseRenderCount = async (uuid: string) => {
   const newCount = currentCount.render_count + 1;
 
   const { data, error } = await supabase
-    .from('trmnl_apple_photos')
+    .from(applePhotosTableName)
     .update({ render_count: newCount, last_render_at: new Date() })
     .eq('id', uuid);
 
@@ -199,4 +206,104 @@ export const increaseRenderCount = async (uuid: string) => {
     console.error('Error increasing render count', error);
     throw error;
   }
+};
+
+export const setPartitionAndWebStream = async ({
+  uuid,
+  apple_partition,
+  web_stream_blob,
+}: {
+  uuid: string;
+  apple_partition: string;
+  web_stream_blob: PublicAlbumWebStream;
+}) => {
+  const { error } = await supabase
+    .from(applePhotosTableName)
+    .update({
+      apple_partition,
+      web_stream_blob,
+      web_stream_blob_fetched_at: new Date(),
+    })
+    .eq('id', uuid);
+
+  if (error) {
+    console.error('Error setting partition and web stream', error);
+    throw error;
+  }
+};
+
+export const getPartitionAndWebStream = async (
+  uuid: string
+): Promise<
+  Result<{
+    apple_partition: string | undefined;
+    web_stream_blob: PublicAlbumWebStream;
+    web_stream_blob_fetched_at: Date | undefined;
+  }>
+> => {
+  const { data, error } = await supabase
+    .from(applePhotosTableName)
+    .select('apple_partition, web_stream_blob, web_stream_blob_fetched_at')
+    .eq('id', uuid)
+    .single();
+
+  if (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+
+  const parsed = webStreamSchema.safeParse(data.web_stream_blob);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.message,
+    };
+  }
+
+  return {
+    success: true,
+    data: {
+      apple_partition: data.apple_partition,
+      web_stream_blob: parsed.data,
+      web_stream_blob_fetched_at: data.web_stream_blob_fetched_at,
+    },
+  };
+};
+
+export const setLastUsedUrl = async ({
+  uuid,
+  url,
+}: { uuid: string; url: string }) => {
+  const { error } = await supabase
+    .from(applePhotosTableName)
+    .update({ last_used_url: url, last_used_url_updated_at: new Date() })
+    .eq('id', uuid);
+
+  if (error) {
+    console.error('Error setting last used url', error);
+    throw error;
+  }
+};
+
+export const getLastUsedUrl = async (uuid: string): Promise<Result<string>> => {
+  const { data, error } = await supabase
+    .from(applePhotosTableName)
+    .select('last_used_url')
+    .eq('id', uuid)
+    .single();
+
+  if (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+
+  return {
+    success: true,
+    data: data.last_used_url,
+  };
 };
