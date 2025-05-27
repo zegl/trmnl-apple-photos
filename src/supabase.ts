@@ -21,12 +21,12 @@ const createUserJwt = (user_uuid: string) => {
 };
 
 export const getSupabaseClientForUser = (user_uuid: string) => {
-  const jwt = createUserJwt(user_uuid);
-  const headers = { Authorization: `Bearer ${jwt}` };
+  // const jwt = createUserJwt(user_uuid);
+  // const headers = { Authorization: `Bearer ${jwt}` };
 
   return createClient(supabaseUrl, supabaseKey, {
-    global: {
-      headers: headers,
-    },
+    // global: {
+    //   headers: headers,
+    // },
   });
 };
