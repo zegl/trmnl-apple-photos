@@ -2,8 +2,12 @@ import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 
 // These should be set in your environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_ANON_KEY || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_ANON_KEY || '';
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  '';
 const supabaseJwtSecret = process.env.SUPABASE_JWT_SECRET || '';
 
 if (!supabaseUrl) {
