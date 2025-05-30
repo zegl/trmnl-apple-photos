@@ -204,4 +204,19 @@ export class BlobRepository {
       data: data.last_used_url,
     };
   };
+
+  setPhotos = async ({
+    uuid,
+    photos,
+  }: { uuid: string; photos: { urls: string[] } }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ photos, photos_updated_at: new Date() })
+      .eq('id', uuid);
+
+    if (error) {
+      console.error('Error setting photos', error);
+      throw error;
+    }
+  };
 }

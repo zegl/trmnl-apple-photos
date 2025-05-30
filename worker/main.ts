@@ -62,6 +62,8 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
       };
     }
 
+    const allImageUrls: string[] = [];
+
     // Crawl all images
     for (const photo of webStream.photos) {
       const webAsset = await fetchPublicAlbumWebAsset(
@@ -70,9 +72,34 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
         photo.photoGuid
       );
       console.log({ guid: photo.photoGuid, webAsset });
+
+      // Largest derivative
+      const largestDerivative = Object.values(photo.derivatives).reduce(
+        (a, b) => {
+          return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
+        }
+      );
+
+      const item = webAsset.items[largestDerivative.checksum];
+      const url = `https://${item.url_location}${item.url_path}`;
+      allImageUrls.push(url);
     }
 
-    console.log(userSettings);
+    await blobRepository.setPhotos({
+      uuid: user_uuid,
+      photos: {
+        urls: allImageUrls,
+      },
+    });
+
+    console.log(`Found ${allImageUrls.length} images`);
+
+    return {
+      success: true,
+      data: {
+        urls: allImageUrls,
+      },
+    };
   },
 });
 
