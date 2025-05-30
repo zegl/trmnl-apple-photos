@@ -224,7 +224,7 @@ export class BlobRepository {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)
       .select('id')
-      .eq('uninstalled_at', null)
+      .is('uninstalled_at', null)
       .not('settings', 'is', null);
 
     if (error) {

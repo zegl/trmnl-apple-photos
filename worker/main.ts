@@ -13,13 +13,23 @@ export type RefreshAlbumInput = {
   user_uuid: string;
 };
 
+export type RefreshAlbumOutput = {
+  success: boolean;
+  error?: string;
+  data?: {
+    urls: string[];
+  };
+};
+
 export const trmnlApplePhotosRefreshAlbum = hatchet.task({
-  name: 'refresh-album',
+  name: 'trmnl-apple-photos-refresh-album',
   retries: 1,
-  fn: async (input: RefreshAlbumInput) => {
+  executionTimeout: '1h',
+  scheduleTimeout: '12h',
+  fn: async (input: RefreshAlbumInput, ctx) => {
     const { user_uuid } = input;
 
-    console.log('Refreshing album', { input, user_uuid });
+    ctx.logger.info('Refreshing album');
 
     const supabase = getSupabaseClientForUser(user_uuid);
 
@@ -27,6 +37,7 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
     const userSettings = await blobRepository.getUserSettings(user_uuid);
     if (!userSettings) {
+        ctx.logger.error('The album has not been set up yet.');
       return {
         success: false,
         error: 'The album has not been set up yet.',
@@ -57,22 +68,28 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
     });
 
     if (webStream.photos.length === 0) {
+      ctx.logger.error('No photos found in the shared album. :-/');
       return {
         success: false,
         error: 'No photos found in the shared album. :-/',
       };
     }
 
+    // For sanity, pick 100 photos at random to save in the database
+    // When the crawl re-runs, the set of photos will be updated.
+    const photos = webStream.photos.sort(() => Math.random() - 0.5).slice(0, 100);
+
     const allImageUrls: string[] = [];
 
     // Crawl all images
-    for (const photo of webStream.photos) {
+    for (const photo of photos) {
+        ctx.logger.info(`Fetching web asset ${albumId}/${photo.photoGuid}`);
+
       const webAsset = await fetchPublicAlbumWebAsset(
         partition,
         albumId,
         photo.photoGuid
       );
-      console.log({ guid: photo.photoGuid, webAsset });
 
       // Largest derivative
       const largestDerivative = Object.values(photo.derivatives).reduce(
@@ -84,6 +101,8 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
       const item = webAsset.items[largestDerivative.checksum];
       const url = `https://${item.url_location}${item.url_path}`;
       allImageUrls.push(url);
+
+      ctx.logger.info(`Found ${url}`);
     }
 
     await blobRepository.setPhotos({
@@ -93,7 +112,7 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
       },
     });
 
-    console.log(`Found ${allImageUrls.length} images`);
+    ctx.logger.info(`Found ${allImageUrls.length} images`);
 
     return {
       success: true,
@@ -107,25 +126,24 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 export const onCron = hatchet.workflow({
   name: 'trmnl-apple-photos-cron',
     on: {
-      cron: '*/15 * * * *',
+      cron: '0 0 * * *' // once per day at midnight
     },
   });
 
 onCron.task({
   name: 'trigger-all',
-  fn: async () => {
+  fn: async (_, ctx) => {
     const supabase = getGenericSupabaseClient();
     const blobRepository = new BlobRepository(supabase);
     const users = await blobRepository.listAllUsers();
 
     if (!users.success) {
-      console.error('Error listing all users', users.error);
-      return;
+      throw new Error('Error listing all users', { cause: users.error });
     }
 
     // For each user, run the refresh album workflow
     for (const user of users.data) {
-      await hatchet.runNoWait(trmnlApplePhotosRefreshAlbum, {
+      await ctx.runNoWaitChild<RefreshAlbumInput, RefreshAlbumOutput>(trmnlApplePhotosRefreshAlbum, {
         user_uuid: user,
         },
         {
