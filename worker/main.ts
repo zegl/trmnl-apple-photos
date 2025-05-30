@@ -26,10 +26,14 @@ export const refreshAlbum = hatchet.task({
 });
 
 async function main() {
+  console.log('Registering worker');
+
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
     workflows: [refreshAlbum],
     slots: 10,
   });
+
+  console.log("Starting worker")
 
   await worker.start();
 }
