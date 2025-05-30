@@ -2,6 +2,7 @@ import { SettingsSchema } from '@/app/settings/types';
 import { BlobRepository } from '@/blobs';
 import { NextResponse } from 'next/server';
 import { getSupabaseClientForUser } from '@/supabase';
+import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -12,6 +13,20 @@ export async function POST(request: Request): Promise<NextResponse> {
     const blobRepository = new BlobRepository(supabaseClient);
 
     await blobRepository.saveUserSettings(parsedBody.uuid, parsedBody);
+
+    const hatchet = Hatchet.init();
+
+    await blobRepository.setCrawlStatus({
+      uuid: parsedBody.uuid,
+      status: 'Refresh scheduled',
+    });
+
+    // Trigger hatchet refresh
+    await hatchet.runNoWait("trmnl-apple-photos-refresh-album", {
+      user_uuid: parsedBody.uuid,
+    }, {
+      priority: Priority.HIGH,
+    });
 
     return NextResponse.json({
       status: 'success',

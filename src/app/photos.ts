@@ -121,3 +121,40 @@ export const getPhotos = async ({
     error: 'Fetching photos failed. :-(',
   };
 };
+
+
+export const getCrawledPhotos = async ({
+  blobRepository,
+  user_uuid,
+}: {
+  blobRepository: BlobRepository;
+  user_uuid: string;
+}): Promise<ImageResult> => {
+  const photos = await blobRepository.getPhotos(user_uuid);
+  if (photos.success) {
+    const allUrls = photos.data.urls;
+    const randomIndex = Math.floor(Math.random() * allUrls.length);
+    const randomUrl = allUrls[randomIndex];
+    return {
+      success: true,
+      data: {
+        url: randomUrl,
+      },
+    };
+  }
+
+  // Get crawl status
+  const crawlStatus = await blobRepository.getCrawlStatus(user_uuid);
+  if (crawlStatus.success) {
+    return {
+      success: false,
+      error: `No photos found: ${crawlStatus.data.status}`,
+    };
+  }
+
+  return {
+    success: false,
+    error: "Album failed :-(",
+  };
+};
+

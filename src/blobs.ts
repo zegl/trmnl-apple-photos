@@ -11,7 +11,6 @@ import {
 } from './app/settings/types';
 import type { Result } from './result';
 
-
 const applePhotosTableName = 'trmnl_apple_photos';
 
 // const applePhotosTableName = 'trmnl_apple_photos_duplicate_dev';
@@ -203,6 +202,96 @@ export class BlobRepository {
     return {
       success: true,
       data: data.last_used_url,
+    };
+  };
+
+  getPhotos = async (uuid: string): Promise<Result<{ urls: string[] }>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('photos')
+      .eq('id', uuid)
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: data.photos,
+    };
+  };
+
+  setPhotos = async ({
+    uuid,
+    photos,
+  }: { uuid: string; photos: { urls: string[] } }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ photos, photos_updated_at: new Date() })
+      .eq('id', uuid);
+
+    if (error) {
+      console.error('Error setting photos', error);
+      throw error;
+    }
+  };
+
+  setCrawlStatus = async ({ uuid, status }: { uuid: string; status: string }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ crawl_status: status })
+      .eq('id', uuid);
+
+    if (error) {
+      console.error('Error setting crawl status', error);
+      throw error;
+    }
+  };
+
+  getCrawlStatus = async (uuid: string): Promise<Result<{ status: string, photos_updated_at: Date | null }>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('crawl_status, photos_updated_at')
+      .eq('id', uuid)
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        status: data.crawl_status,
+        photos_updated_at: data.photos_updated_at ? new Date(data.photos_updated_at) : null,
+      },
+    };
+  };
+
+  listAllUsers = async (): Promise<Result<string[]>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('id')
+      .is('uninstalled_at', null)
+      .not('settings', 'is', null);
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: data.map((user) => user.id),
     };
   };
 }

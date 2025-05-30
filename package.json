@@ -10,9 +10,11 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint:biome": "biome check .",
-    "lint:biome:fix": "biome check --apply ."
+    "lint:biome:fix": "biome check --apply.",
+    "start:worker": "tsx worker/main.ts"
   },
   "dependencies": {
+    "@hatchet-dev/typescript-sdk": "^1.6.3",
     "@supabase/supabase-js": "^2.49.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@vercel/blob": "^1.0.1",
@@ -22,6 +24,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",
+    "tsx": "^4.19.4",
     "zod": "^3.24.4"
   },
   "devDependencies": {
