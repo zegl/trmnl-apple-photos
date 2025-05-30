@@ -18,7 +18,8 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
   retries: 1,
   fn: async (input: RefreshAlbumInput) => {
     const { user_uuid } = input;
-    console.log(`Refreshing album ${user_uuid}`);
+
+    console.log('Refreshing album', { input, user_uuid });
 
     const supabase = getSupabaseClientForUser(user_uuid);
 
