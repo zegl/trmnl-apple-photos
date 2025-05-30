@@ -11,7 +11,6 @@ import {
 } from './app/settings/types';
 import type { Result } from './result';
 
-
 const applePhotosTableName = 'trmnl_apple_photos';
 
 // const applePhotosTableName = 'trmnl_apple_photos_duplicate_dev';
