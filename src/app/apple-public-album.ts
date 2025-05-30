@@ -89,9 +89,14 @@ export const fetchPublicAlbumWebAsset = async (
 
   if (response.status !== 200) {
     const text = await response.text();
-    throw new Error(`Failed to fetch public album web asset: url= ${url} status= ${response.status} text=${text}`);
+    throw new Error(`Failed to fetch public album web asset: url=${url} status=${response.status} text=${text}`);
   }
   
-  const data = await response.json();
-  return publicAlbumWebAssetSchema.parse(data);
+  try {
+    const data = await response.json();
+    return publicAlbumWebAssetSchema.parse(data);
+  } catch (error) {
+    console.error(`Failed to parse public album web asset: url=${url} status=${response.status} error=${error}`);
+    throw error;
+  }
 };

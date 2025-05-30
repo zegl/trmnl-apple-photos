@@ -23,7 +23,7 @@ export type RefreshAlbumOutput = {
 
 export const trmnlApplePhotosRefreshAlbum = hatchet.task({
   name: 'trmnl-apple-photos-refresh-album',
-  retries: 1,
+  retries: 10,
   executionTimeout: '1h',
   scheduleTimeout: '12h',
   fn: async (input: RefreshAlbumInput, ctx) => {
@@ -177,7 +177,7 @@ async function main() {
 
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
     workflows: [trmnlApplePhotosRefreshAlbum, onCron],
-    slots: 20,
+    slots: 10,
   });
 
   console.log('Starting worker');
