@@ -177,7 +177,7 @@ async function main() {
 
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
     workflows: [trmnlApplePhotosRefreshAlbum, onCron],
-    slots: 10,
+    slots: 50,
   });
 
   console.log('Starting worker');
