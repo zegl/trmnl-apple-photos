@@ -205,6 +205,26 @@ export class BlobRepository {
     };
   };
 
+  getPhotos = async (uuid: string): Promise<Result<{ urls: string[] }>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('photos')
+      .eq('id', uuid)
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: data.photos,
+    };
+  };
+
   setPhotos = async ({
     uuid,
     photos,
@@ -230,6 +250,29 @@ export class BlobRepository {
       console.error('Error setting crawl status', error);
       throw error;
     }
+  };
+
+  getCrawlStatus = async (uuid: string): Promise<Result<{ status: string, photos_updated_at: Date | null }>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('crawl_status, photos_updated_at')
+      .eq('id', uuid)
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        status: data.crawl_status,
+        photos_updated_at: data.photos_updated_at ? new Date(data.photos_updated_at) : null,
+      },
+    };
   };
 
   listAllUsers = async (): Promise<Result<string[]>> => {

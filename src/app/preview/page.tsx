@@ -1,7 +1,7 @@
 import { BlobRepository } from '@/blobs';
 import FullScreenMessage from '../FullScreenMessage';
 import Render from '../Render';
-import { getPhotos } from '../photos';
+import { getCrawledPhotos, getPhotos } from '../photos';
 import { getSupabaseClientForUser } from '@/supabase';
 
 export default async function Page({
@@ -33,10 +33,15 @@ export default async function Page({
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  const photos = await getPhotos({ blobRepository, user_uuid });
+  const photos = await getCrawledPhotos({ blobRepository, user_uuid });
   if (!photos.success) {
     return <FullScreenMessage message={photos.error} />;
   }
+
+  const crawlStatus = await blobRepository.getCrawlStatus(user_uuid);
+
+  const lastUpdatedAt = crawlStatus.success ? crawlStatus.data.photos_updated_at : null;
+  const lastUpdatedAtMessage = lastUpdatedAt ? `Album last updated at: ${lastUpdatedAt.toISOString().replace('T', ' ').slice(0, 16)}` : '';
 
   const { url } = photos.data;
 
@@ -64,6 +69,8 @@ export default async function Page({
       <a href={backToTrmnlUrl} className="button">
         Back to TRMNL
       </a>
+
+      {lastUpdatedAtMessage && <p>{lastUpdatedAtMessage}</p>}
 
       <h1>full</h1>
 
