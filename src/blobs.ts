@@ -220,6 +220,18 @@ export class BlobRepository {
     }
   };
 
+  setCrawlStatus = async ({ uuid, status }: { uuid: string; status: string }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ crawl_status: status })
+      .eq('id', uuid);
+
+    if (error) {
+      console.error('Error setting crawl status', error);
+      throw error;
+    }
+  };
+
   listAllUsers = async (): Promise<Result<string[]>> => {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)

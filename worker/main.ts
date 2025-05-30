@@ -35,9 +35,18 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
     const blobRepository = new BlobRepository(supabase);
 
+    await blobRepository.setCrawlStatus({
+      uuid: user_uuid,
+      status: 'Refresh started',
+    });
+
     const userSettings = await blobRepository.getUserSettings(user_uuid);
     if (!userSettings) {
         ctx.logger.error('The album has not been set up yet.');
+        await blobRepository.setCrawlStatus({
+            uuid: user_uuid,
+            status: 'Refresh failed, album not set up',
+        });
       return {
         success: false,
         error: 'The album has not been set up yet.',
@@ -69,6 +78,10 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
     if (webStream.photos.length === 0) {
       ctx.logger.error('No photos found in the shared album. :-/');
+      await blobRepository.setCrawlStatus({
+        uuid: user_uuid,
+        status: 'Refresh failed, no photos found',
+      });
       return {
         success: false,
         error: 'No photos found in the shared album. :-/',
@@ -113,6 +126,11 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
     });
 
     ctx.logger.info(`Found ${allImageUrls.length} images`);
+
+    await blobRepository.setCrawlStatus({
+      uuid: user_uuid,
+      status: 'Updated',
+    });
 
     return {
       success: true,
