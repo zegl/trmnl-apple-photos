@@ -14,7 +14,7 @@ export type RefreshAlbumInput = {
 };
 
 export const trmnlApplePhotosRefreshAlbum = hatchet.task({
-  name: 'trmnl-apple-photos-refresh-album',
+  name: 'refresh-album',
   retries: 1,
   fn: async (input: RefreshAlbumInput) => {
     const { user_uuid } = input;
@@ -112,7 +112,7 @@ export const onCron = hatchet.workflow({
   });
 
 onCron.task({
-  name: 'trmnl-apple-photos-cron-task',
+  name: 'trigger-all',
   fn: async () => {
     const supabase = getGenericSupabaseClient();
     const blobRepository = new BlobRepository(supabase);
