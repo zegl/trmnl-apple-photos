@@ -219,4 +219,24 @@ export class BlobRepository {
       throw error;
     }
   };
+
+  listAllUsers = async (): Promise<Result<string[]>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('id')
+      .eq('uninstalled_at', null)
+      .not('settings', 'is', null);
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: data.map((user) => user.id),
+    };
+  };
 }

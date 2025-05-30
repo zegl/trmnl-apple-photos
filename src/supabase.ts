@@ -42,3 +42,7 @@ export const getSupabaseClientForUser = (user_uuid: string) => {
     // },
   });
 };
+
+export const getGenericSupabaseClient = () => {
+  return createClient(supabaseUrl, supabaseKey);
+};

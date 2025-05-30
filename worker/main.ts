@@ -4,8 +4,8 @@ import {
   getPublicAlbumId,
 } from '@/app/apple-public-album';
 import { BlobRepository } from '@/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
-import { Hatchet } from '@hatchet-dev/typescript-sdk';
+import { getGenericSupabaseClient, getSupabaseClientForUser } from '@/supabase';
+import { Hatchet, Priority } from '@hatchet-dev/typescript-sdk';
 
 export const hatchet = Hatchet.init();
 
@@ -104,11 +104,43 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
   },
 });
 
+export const onCron = hatchet.workflow({
+  name: 'trmnl-apple-photos-cron',
+    on: {
+      cron: '*/15 * * * *',
+    },
+  });
+
+onCron.task({
+  name: 'trmnl-apple-photos-cron-task',
+  fn: async () => {
+    const supabase = getGenericSupabaseClient();
+    const blobRepository = new BlobRepository(supabase);
+    const users = await blobRepository.listAllUsers();
+
+    if (!users.success) {
+      console.error('Error listing all users', users.error);
+      return;
+    }
+
+    // For each user, run the refresh album workflow
+    for (const user of users.data) {
+      await hatchet.runNoWait(trmnlApplePhotosRefreshAlbum, {
+        user_uuid: user,
+        },
+        {
+          priority: Priority.LOW,
+        }
+      );
+    }
+  },
+});
+
 async function main() {
   console.log('Registering worker');
 
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
-    workflows: [trmnlApplePhotosRefreshAlbum],
+    workflows: [trmnlApplePhotosRefreshAlbum, onCron],
     slots: 10,
   });
 
