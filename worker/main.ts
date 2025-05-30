@@ -13,7 +13,7 @@ export type RefreshAlbumInput = {
   user_uuid: string;
 };
 
-export const refreshAlbum = hatchet.task({
+export const trmnlApplePhotosRefreshAlbum = hatchet.task({
   name: 'trmnl-apple-photos:refresh-album',
   retries: 1,
   fn: async (input: RefreshAlbumInput) => {
@@ -80,7 +80,7 @@ async function main() {
   console.log('Registering worker');
 
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
-    workflows: [refreshAlbum],
+    workflows: [trmnlApplePhotosRefreshAlbum],
     slots: 10,
   });
 
