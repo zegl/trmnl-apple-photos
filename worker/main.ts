@@ -14,7 +14,7 @@ export type RefreshAlbumInput = {
 };
 
 export const trmnlApplePhotosRefreshAlbum = hatchet.task({
-  name: 'trmnl-apple-photos:refresh-album',
+  name: 'trmnl-apple-photos-refresh-album',
   retries: 1,
   fn: async (input: RefreshAlbumInput) => {
     const { user_uuid } = input;
