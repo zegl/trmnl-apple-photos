@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getCrawledPhotos, getPhotos } from '../photos';
+import { getPhotos } from '../photos';
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 
@@ -40,12 +40,7 @@ export async function POST(request: Request) {
   const supabaseClient = getSupabaseClientForUser(user_uuid);
   const blobRepository = new BlobRepository(supabaseClient);
 
-  // let photos = await getCrawledPhotos({ blobRepository, user_uuid });
-
-  // fallback to on demand crawler
-  // if (!photos.success) {
   const photos = await getPhotos({ blobRepository, user_uuid });
-  // }
 
   if (photos.success) {
     const { url } = photos.data;

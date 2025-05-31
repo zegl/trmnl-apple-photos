@@ -1,7 +1,7 @@
 import { BlobRepository } from '@/blobs';
 import FullScreenMessage from '../FullScreenMessage';
 import Render from '../Render';
-import { getCrawledPhotos, getPhotos } from '../photos';
+import { getPhotos } from '../photos';
 import { getSupabaseClientForUser } from '@/supabase';
 
 export default async function Page({
@@ -33,7 +33,6 @@ export default async function Page({
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  // const photos = await getCrawledPhotos({ blobRepository, user_uuid });
   const photos = await getPhotos({ blobRepository, user_uuid });
   if (!photos.success) {
     return <FullScreenMessage message={photos.error} />;
