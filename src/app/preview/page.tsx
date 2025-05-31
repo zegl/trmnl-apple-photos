@@ -33,7 +33,8 @@ export default async function Page({
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  const photos = await getCrawledPhotos({ blobRepository, user_uuid });
+  // const photos = await getCrawledPhotos({ blobRepository, user_uuid });
+  const photos = await getPhotos({ blobRepository, user_uuid });
   if (!photos.success) {
     return <FullScreenMessage message={photos.error} />;
   }
