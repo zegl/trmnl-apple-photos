@@ -3,6 +3,7 @@ import {
   fetchPublicAlbumWebAsset,
   fetchPublicAlbumWebStream,
   getPublicAlbumId,
+  type PublicAlbumWebStream,
 } from './apple-public-album';
 import type { Result } from '@/result';
 import type { Settings } from './settings/types';
@@ -76,6 +77,52 @@ const tryCrawlNewImage = async ({
   };
 };
 
+export const getRandomPhotoFromWebStream = async ({
+  partition,
+  albumId,
+  web_stream_blob,
+}: {
+  partition: string;
+  albumId: string;
+  web_stream_blob: PublicAlbumWebStream;
+}): Promise<ImageResult> => {
+
+  const photos = web_stream_blob.photos.
+  filter((photo) => photo.mediaAssetType !== 'video').
+  filter((photo) => Object.keys(photo.derivatives).length > 0).
+  filter((photo) => photo.width !== undefined && Number.parseInt(photo.width) > 100 && photo.height !== undefined && Number.parseInt(photo.height) > 100)
+
+  if (photos.length === 0) {
+    return {
+      success: false,
+      error: 'No photos found in the shared album. :-/',
+    };
+  }
+
+  const randomIndex = Math.floor(Math.random() * photos.length);
+  const randomPhoto = photos[randomIndex];
+
+  const webAsset = await fetchPublicAlbumWebAsset(
+    partition,
+    albumId,
+    randomPhoto.photoGuid
+  );
+
+  const largestDerivative = Object.values(randomPhoto.derivatives).reduce((a, b) => {
+    return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
+  });
+
+  const item = webAsset.items[largestDerivative.checksum];
+  const url = `https://${item.url_location}${item.url_path}`;
+
+  return {
+    success: true,
+    data: {
+      url,
+    },
+  };
+}
+
 export const getPhotos = async ({
   blobRepository,
   user_uuid,
@@ -91,34 +138,22 @@ export const getPhotos = async ({
     };
   }
 
-  const tryCrawlNewImageResult = await tryCrawlNewImage({
-    blobRepository,
-    user_uuid,
-    settings,
-  });
-  if (tryCrawlNewImageResult.success) {
-    await blobRepository.setLastUsedUrl({
-      uuid: user_uuid,
-      url: tryCrawlNewImageResult.data.url,
+  // If we have a web stream blob, use it to get a random photo
+  const webStreamResult = await blobRepository.getPartitionAndWebStream(user_uuid);
+  if (webStreamResult.success && webStreamResult.data.apple_partition && webStreamResult.data.web_stream_blob) {
+    const imageFromCachedWebStream = await getRandomPhotoFromWebStream({
+      partition: webStreamResult.data.apple_partition,
+      albumId: getPublicAlbumId(settings.sharedAlbumUrl),
+      web_stream_blob: webStreamResult.data.web_stream_blob,
     });
-    return tryCrawlNewImageResult;
+    if (imageFromCachedWebStream.success) {
+      return imageFromCachedWebStream;
+    }
   }
 
-  // Fallback to last used url if crawl fails
-  const lastUsedUrlResult = await blobRepository.getLastUsedUrl(user_uuid);
-  if (lastUsedUrlResult.success) {
-    return {
-      success: true,
-      data: {
-        url: lastUsedUrlResult.data,
-      },
-    };
-  }
-
-  // Crawl failed and no last used url
   return {
     success: false,
-    error: 'Fetching photos failed. :-(',
+    error: 'No photos found. If you recently added this album, please wait a few minutes and try again.',
   };
 };
 

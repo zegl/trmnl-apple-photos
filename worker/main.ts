@@ -1,5 +1,4 @@
 import {
-  fetchPublicAlbumWebAsset,
   fetchPublicAlbumWebStream,
   getPublicAlbumId,
 } from '@/app/apple-public-album';
@@ -16,20 +15,17 @@ export type RefreshAlbumInput = {
 export type RefreshAlbumOutput = {
   success: boolean;
   error?: string;
-  data?: {
-    urls: string[];
-  };
 };
 
 export const trmnlApplePhotosRefreshAlbum = hatchet.task({
   name: 'trmnl-apple-photos-refresh-album',
-  retries: 10,
-  executionTimeout: '1h',
+  retries: 2,
+  executionTimeout: '10m',
   scheduleTimeout: '12h',
   fn: async (input: RefreshAlbumInput, ctx) => {
     const { user_uuid } = input;
 
-    ctx.logger.info('Refreshing album');
+    ctx.logger.info(`Refreshing album: ${JSON.stringify(input)}`);
 
     const supabase = getSupabaseClientForUser(user_uuid);
 
@@ -88,44 +84,7 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
       };
     }
 
-    // For sanity, pick 100 photos at random to save in the database
-    // When the crawl re-runs, the set of photos will be updated.
-    const photos = webStream.photos.sort(() => Math.random() - 0.5).slice(0, 100);
-
-    const allImageUrls: string[] = [];
-
-    // Crawl all images
-    for (const photo of photos) {
-        ctx.logger.info(`Fetching web asset ${albumId}/${photo.photoGuid}`);
-
-      const webAsset = await fetchPublicAlbumWebAsset(
-        partition,
-        albumId,
-        photo.photoGuid
-      );
-
-      // Largest derivative
-      const largestDerivative = Object.values(photo.derivatives).reduce(
-        (a, b) => {
-          return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
-        }
-      );
-
-      const item = webAsset.items[largestDerivative.checksum];
-      const url = `https://${item.url_location}${item.url_path}`;
-      allImageUrls.push(url);
-
-      ctx.logger.info(`Found ${url}`);
-    }
-
-    await blobRepository.setPhotos({
-      uuid: user_uuid,
-      photos: {
-        urls: allImageUrls,
-      },
-    });
-
-    ctx.logger.info(`Found ${allImageUrls.length} images`);
+    ctx.logger.info(`Fetched ${webStream.photos.length} photos`);
 
     await blobRepository.setCrawlStatus({
       uuid: user_uuid,
@@ -134,9 +93,6 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
     return {
       success: true,
-      data: {
-        urls: allImageUrls,
-      },
     };
   },
 });
@@ -177,7 +133,7 @@ async function main() {
 
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
     workflows: [trmnlApplePhotosRefreshAlbum, onCron],
-    slots: 10,
+    slots: 2,
   });
 
   console.log('Starting worker');

@@ -5,23 +5,26 @@ export const getPublicAlbumId = (sharedAlbumUrl: string) => {
   return albumId;
 };
 
+const webStreamDerivativeSchema = z.object({
+  fileSize: z.string(),
+  checksum: z.string(),
+  width: z.string(),
+  height: z.string(),
+});
+
 export const webStreamSchema = z.object({
   streamName: z.string(),
   photos: z.array(
-    z.object({
-      photoGuid: z.string(),
-      derivatives: z.record(
-        z.string(),
-        z.object({
-          fileSize: z.string(),
-          checksum: z.string(),
-          width: z.string(),
-          height: z.string(),
-        })
-      ),
-    })
+      z.object({
+        batchGuid: z.string(),
+        derivatives: z.record(z.string(), webStreamDerivativeSchema),
+        photoGuid: z.string(),
+        width: z.string().optional(),
+        height: z.string().optional(),
+        mediaAssetType: z.string().optional(),
+      }),  
   ),
-});
+})
 
 const webStreamRedirectSchema = z.object({
   'X-Apple-MMe-Host': z.string(),
@@ -51,14 +54,17 @@ export const fetchPublicAlbumWebStream = async (
     }),
   });
   const data = await response.json();
-  const result = webStreamOrRedirectSchema.parse(data);
-  if ('X-Apple-MMe-Host' in result) {
+  const result = webStreamOrRedirectSchema.safeParse(data);
+  if (!result.success) {
+    throw new Error(`Failed to fetch public album web stream: url=${url} status=${response.status} error=${result.error}`);
+  }
+  if ('X-Apple-MMe-Host' in result.data) {
     return fetchPublicAlbumWebStream(
-      getHostPartition(result['X-Apple-MMe-Host']),
+      getHostPartition(result.data['X-Apple-MMe-Host']),
       albumId
     );
   }
-  return { webStream: result, partition: partition };
+  return { webStream: result.data, partition: partition };
 };
 
 export const publicAlbumWebAssetSchema = z.object({

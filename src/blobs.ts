@@ -10,10 +10,16 @@ import {
   type UserBlob,
 } from './app/settings/types';
 import type { Result } from './result';
+import { z } from 'zod';
 
 const applePhotosTableName = 'trmnl_apple_photos';
 
-// const applePhotosTableName = 'trmnl_apple_photos_duplicate_dev';
+const PhotosSchema = z.object({
+  uuids: z.array(z.string()).optional(),
+  urls: z.array(z.string()).optional(),
+});
+
+type Photos = z.infer<typeof PhotosSchema>;
 
 export class BlobRepository {
   constructor(private readonly supabaseClient: SupabaseClient) {}
@@ -205,7 +211,7 @@ export class BlobRepository {
     };
   };
 
-  getPhotos = async (uuid: string): Promise<Result<{ urls: string[] }>> => {
+  getPhotos = async (uuid: string): Promise<Result<Photos>> => {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)
       .select('photos')
@@ -219,16 +225,25 @@ export class BlobRepository {
       };
     }
 
+    const parsed = PhotosSchema.safeParse(data.photos);
+
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.message,
+      };
+    }
+
     return {
       success: true,
-      data: data.photos,
+      data: parsed.data,
     };
   };
 
   setPhotos = async ({
     uuid,
     photos,
-  }: { uuid: string; photos: { urls: string[] } }) => {
+  }: { uuid: string; photos: Photos }) => {
     const { error } = await this.supabaseClient
       .from(applePhotosTableName)
       .update({ photos, photos_updated_at: new Date() })
