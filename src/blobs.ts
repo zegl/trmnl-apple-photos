@@ -240,10 +240,7 @@ export class BlobRepository {
     };
   };
 
-  setPhotos = async ({
-    uuid,
-    photos,
-  }: { uuid: string; photos: Photos }) => {
+  setPhotos = async ({ uuid, photos }: { uuid: string; photos: Photos }) => {
     const { error } = await this.supabaseClient
       .from(applePhotosTableName)
       .update({ photos, photos_updated_at: new Date() })
@@ -255,7 +252,10 @@ export class BlobRepository {
     }
   };
 
-  setCrawlStatus = async ({ uuid, status }: { uuid: string; status: string }) => {
+  setCrawlStatus = async ({
+    uuid,
+    status,
+  }: { uuid: string; status: string }) => {
     const { error } = await this.supabaseClient
       .from(applePhotosTableName)
       .update({ crawl_status: status })
@@ -267,7 +267,9 @@ export class BlobRepository {
     }
   };
 
-  getCrawlStatus = async (uuid: string): Promise<Result<{ status: string, photos_updated_at: Date | null }>> => {
+  getCrawlStatus = async (
+    uuid: string
+  ): Promise<Result<{ status: string; photos_updated_at: Date | null }>> => {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)
       .select('crawl_status, photos_updated_at')
@@ -285,7 +287,9 @@ export class BlobRepository {
       success: true,
       data: {
         status: data.crawl_status,
-        photos_updated_at: data.photos_updated_at ? new Date(data.photos_updated_at) : null,
+        photos_updated_at: data.photos_updated_at
+          ? new Date(data.photos_updated_at)
+          : null,
       },
     };
   };

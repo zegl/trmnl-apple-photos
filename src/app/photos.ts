@@ -86,11 +86,16 @@ export const getRandomPhotoFromWebStream = async ({
   albumId: string;
   web_stream_blob: PublicAlbumWebStream;
 }): Promise<ImageResult> => {
-
-  const photos = web_stream_blob.photos.
-  filter((photo) => photo.mediaAssetType !== 'video').
-  filter((photo) => Object.keys(photo.derivatives).length > 0).
-  filter((photo) => photo.width !== undefined && Number.parseInt(photo.width) > 100 && photo.height !== undefined && Number.parseInt(photo.height) > 100)
+  const photos = web_stream_blob.photos
+    .filter((photo) => photo.mediaAssetType !== 'video')
+    .filter((photo) => Object.keys(photo.derivatives).length > 0)
+    .filter(
+      (photo) =>
+        photo.width !== undefined &&
+        Number.parseInt(photo.width) > 100 &&
+        photo.height !== undefined &&
+        Number.parseInt(photo.height) > 100
+    );
 
   if (photos.length === 0) {
     return {
@@ -108,9 +113,11 @@ export const getRandomPhotoFromWebStream = async ({
     randomPhoto.photoGuid
   );
 
-  const largestDerivative = Object.values(randomPhoto.derivatives).reduce((a, b) => {
-    return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
-  });
+  const largestDerivative = Object.values(randomPhoto.derivatives).reduce(
+    (a, b) => {
+      return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
+    }
+  );
 
   const item = webAsset.items[largestDerivative.checksum];
   const url = `https://${item.url_location}${item.url_path}`;
@@ -121,7 +128,7 @@ export const getRandomPhotoFromWebStream = async ({
       url,
     },
   };
-}
+};
 
 export const getPhotos = async ({
   blobRepository,
@@ -139,8 +146,13 @@ export const getPhotos = async ({
   }
 
   // If we have a web stream blob, use it to get a random photo
-  const webStreamResult = await blobRepository.getPartitionAndWebStream(user_uuid);
-  if (webStreamResult.success && webStreamResult.data.apple_partition && webStreamResult.data.web_stream_blob) {
+  const webStreamResult =
+    await blobRepository.getPartitionAndWebStream(user_uuid);
+  if (
+    webStreamResult.success &&
+    webStreamResult.data.apple_partition &&
+    webStreamResult.data.web_stream_blob
+  ) {
     const imageFromCachedWebStream = await getRandomPhotoFromWebStream({
       partition: webStreamResult.data.apple_partition,
       albumId: getPublicAlbumId(settings.sharedAlbumUrl),
@@ -153,43 +165,7 @@ export const getPhotos = async ({
 
   return {
     success: false,
-    error: 'No photos found. If you recently added this album, please wait a few minutes and try again.',
+    error:
+      'No photos found. If you recently added this album, please wait a few minutes and try again.',
   };
 };
-
-
-export const getCrawledPhotos = async ({
-  blobRepository,
-  user_uuid,
-}: {
-  blobRepository: BlobRepository;
-  user_uuid: string;
-}): Promise<ImageResult> => {
-  const photos = await blobRepository.getPhotos(user_uuid);
-  if (photos.success) {
-    const allUrls = photos.data.urls;
-    const randomIndex = Math.floor(Math.random() * allUrls.length);
-    const randomUrl = allUrls[randomIndex];
-    return {
-      success: true,
-      data: {
-        url: randomUrl,
-      },
-    };
-  }
-
-  // Get crawl status
-  const crawlStatus = await blobRepository.getCrawlStatus(user_uuid);
-  if (crawlStatus.success) {
-    return {
-      success: false,
-      error: `No photos found: ${crawlStatus.data.status}`,
-    };
-  }
-
-  return {
-    success: false,
-    error: "Album failed :-(",
-  };
-};
-

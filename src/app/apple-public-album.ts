@@ -15,16 +15,16 @@ const webStreamDerivativeSchema = z.object({
 export const webStreamSchema = z.object({
   streamName: z.string(),
   photos: z.array(
-      z.object({
-        batchGuid: z.string(),
-        derivatives: z.record(z.string(), webStreamDerivativeSchema),
-        photoGuid: z.string(),
-        width: z.string().optional(),
-        height: z.string().optional(),
-        mediaAssetType: z.string().optional(),
-      }),  
+    z.object({
+      batchGuid: z.string(),
+      derivatives: z.record(z.string(), webStreamDerivativeSchema),
+      photoGuid: z.string(),
+      width: z.string().optional(),
+      height: z.string().optional(),
+      mediaAssetType: z.string().optional(),
+    })
   ),
-})
+});
 
 const webStreamRedirectSchema = z.object({
   'X-Apple-MMe-Host': z.string(),
@@ -56,7 +56,9 @@ export const fetchPublicAlbumWebStream = async (
   const data = await response.json();
   const result = webStreamOrRedirectSchema.safeParse(data);
   if (!result.success) {
-    throw new Error(`Failed to fetch public album web stream: url=${url} status=${response.status} error=${result.error}`);
+    throw new Error(
+      `Failed to fetch public album web stream: url=${url} status=${response.status} error=${result.error}`
+    );
   }
   if ('X-Apple-MMe-Host' in result.data) {
     return fetchPublicAlbumWebStream(
@@ -95,14 +97,18 @@ export const fetchPublicAlbumWebAsset = async (
 
   if (response.status !== 200) {
     const text = await response.text();
-    throw new Error(`Failed to fetch public album web asset: url=${url} status=${response.status} text=${text}`);
+    throw new Error(
+      `Failed to fetch public album web asset: url=${url} status=${response.status} text=${text}`
+    );
   }
-  
+
   try {
     const data = await response.json();
     return publicAlbumWebAssetSchema.parse(data);
   } catch (error) {
-    console.error(`Failed to parse public album web asset: url=${url} status=${response.status} error=${error}`);
+    console.error(
+      `Failed to parse public album web asset: url=${url} status=${response.status} error=${error}`
+    );
     throw error;
   }
 };

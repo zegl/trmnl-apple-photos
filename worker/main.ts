@@ -38,11 +38,11 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
     const userSettings = await blobRepository.getUserSettings(user_uuid);
     if (!userSettings) {
-        ctx.logger.error('The album has not been set up yet.');
-        await blobRepository.setCrawlStatus({
-            uuid: user_uuid,
-            status: 'Refresh failed, album not set up',
-        });
+      ctx.logger.error('The album has not been set up yet.');
+      await blobRepository.setCrawlStatus({
+        uuid: user_uuid,
+        status: 'Refresh failed, album not set up',
+      });
       return {
         success: false,
         error: 'The album has not been set up yet.',
@@ -99,10 +99,10 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
 export const onCron = hatchet.workflow({
   name: 'trmnl-apple-photos-cron',
-    on: {
-      cron: '0 0 * * *' // once per day at midnight
-    },
-  });
+  on: {
+    cron: '0 0 * * *', // once per day at midnight
+  },
+});
 
 onCron.task({
   name: 'trigger-all',
@@ -117,8 +117,10 @@ onCron.task({
 
     // For each user, run the refresh album workflow
     for (const user of users.data) {
-      await ctx.runNoWaitChild<RefreshAlbumInput, RefreshAlbumOutput>(trmnlApplePhotosRefreshAlbum, {
-        user_uuid: user,
+      await ctx.runNoWaitChild<RefreshAlbumInput, RefreshAlbumOutput>(
+        trmnlApplePhotosRefreshAlbum,
+        {
+          user_uuid: user,
         },
         {
           priority: Priority.LOW,
