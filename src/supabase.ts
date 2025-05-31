@@ -22,17 +22,17 @@ if (!supabaseJwtSecret) {
   throw new Error('Supabase JWT secret is missing');
 }
 
-const createUserJwt = (user_uuid: string) => {
+const _createUserJwt = (user_uuid: string) => {
   return jwt.sign(
     {
       sub: user_uuid,
-      iat: new Date().getTime() / 1000,
+      iat: Date.now() / 1000,
     },
     supabaseJwtSecret
   );
 };
 
-export const getSupabaseClientForUser = (user_uuid: string) => {
+export const getSupabaseClientForUser = (_user_uuid: string) => {
   // const jwt = createUserJwt(user_uuid);
   // const headers = { Authorization: `Bearer ${jwt}` };
 

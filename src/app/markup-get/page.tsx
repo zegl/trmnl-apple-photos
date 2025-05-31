@@ -1,6 +1,5 @@
 import FullScreenMessage from '../FullScreenMessage';
 import Render from '../Render';
-import { getPhotos } from '../photos';
 
 export default async function Page({
   searchParams,

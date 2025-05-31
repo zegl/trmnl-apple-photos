@@ -10,7 +10,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://usetrmnl.com/css/latest/plugins.css"
         />
-        <script src="https://usetrmnl.com/js/latest/plugins.js"></script>
+        <script src="https://usetrmnl.com/js/latest/plugins.js" />
       </head>
       <body className="environment trmnl">{children}</body>
     </html>

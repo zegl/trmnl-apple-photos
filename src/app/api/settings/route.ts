@@ -1,8 +1,8 @@
+import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
+import { NextResponse } from 'next/server';
 import { SettingsSchema } from '@/app/settings/types';
 import { BlobRepository } from '@/blobs';
-import { NextResponse } from 'next/server';
 import { getSupabaseClientForUser } from '@/supabase';
-import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {

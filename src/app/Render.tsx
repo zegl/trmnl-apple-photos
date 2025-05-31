@@ -2,7 +2,11 @@ export default function Render({
   url,
   size,
   show_message,
-}: { url: string; size: string; show_message?: string }) {
+}: {
+  url: string;
+  size: string;
+  show_message?: string;
+}) {
   return (
     <div
       className={`view view--${size}`}
@@ -30,7 +34,7 @@ export default function Render({
               overflow: 'hidden',
             }}
             className="image-dither"
-          ></div>
+          />
           {/* <img
             style={{
               // width: `calc(var(--${size}-w) - 6px)`,
@@ -56,7 +60,7 @@ export default function Render({
               left: 0,
               zIndex: 1,
             }}
-          ></div>
+          />
         </>
       )}
     </div>

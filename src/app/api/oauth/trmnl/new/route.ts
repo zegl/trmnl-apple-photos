@@ -34,7 +34,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     body: formData.toString(),
   });
   const fetchTokenData = await fetchTokenResponse.json();
-  const accessToken = fetchTokenData.access_token;
+  const _accessToken = fetchTokenData.access_token;
   console.log('fetchTokenData', fetchTokenData);
 
   if (fetchTokenData.error) {

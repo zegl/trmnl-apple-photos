@@ -1,19 +1,19 @@
 import type { BlobRepository } from '@/blobs';
+import { crawlAlbum } from '@/crawl';
+import type { Result } from '@/result';
 import {
   fetchPublicAlbumWebAsset,
   fetchPublicAlbumWebStream,
   getPublicAlbumId,
   type PublicAlbumWebStream,
 } from './apple-public-album';
-import type { Result } from '@/result';
 import type { Settings } from './settings/types';
-import { crawlAlbum } from '@/crawl';
 
 type ImageResult = Result<{
   url: string;
 }>;
 
-const tryCrawlNewImage = async ({
+const _tryCrawlNewImage = async ({
   blobRepository,
   user_uuid,
   settings,
@@ -141,7 +141,7 @@ export const getPhotos = async ({
   crawl_if_missing: boolean;
 }): Promise<ImageResult> => {
   const settings = await blobRepository.getUserSettings(user_uuid);
-  if (!settings) {
+  if (!settings.success) {
     return {
       success: false,
       error: 'The album has not been set up yet.',
@@ -152,8 +152,6 @@ export const getPhotos = async ({
   const webStreamResult =
     await blobRepository.getPartitionAndWebStream(user_uuid);
 
-  console.log('webStreamResult', webStreamResult);
-
   if (
     webStreamResult.success &&
     webStreamResult.data.apple_partition &&
@@ -161,7 +159,7 @@ export const getPhotos = async ({
   ) {
     const imageFromCachedWebStream = await getRandomPhotoFromWebStream({
       partition: webStreamResult.data.apple_partition,
-      albumId: getPublicAlbumId(settings.sharedAlbumUrl),
+      albumId: getPublicAlbumId(settings.data.sharedAlbumUrl),
       web_stream_blob: webStreamResult.data.web_stream_blob,
     });
     console.log('imageFromCachedWebStream', imageFromCachedWebStream);

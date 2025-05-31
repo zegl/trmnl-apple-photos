@@ -1,16 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { z } from 'zod';
 import {
   type PublicAlbumWebStream,
   webStreamSchema,
 } from './app/apple-public-album';
 import {
-  SettingsSchema,
   type Settings,
-  UserBlobSchema,
+  SettingsSchema,
   type UserBlob,
+  UserBlobSchema,
 } from './app/settings/types';
 import type { Result } from './result';
-import { z } from 'zod';
 
 const applePhotosTableName = 'trmnl_apple_photos';
 
@@ -26,25 +26,34 @@ type WebStreamStatus = 'not_found' | 'found' | 'error';
 export class BlobRepository {
   constructor(private readonly supabaseClient: SupabaseClient) {}
 
-  getUserBlob = async (uuid: string): Promise<UserBlob | undefined> => {
-    try {
-      const { data, error } = await this.supabaseClient
-        .from(applePhotosTableName)
-        .select('user')
-        .eq('id', uuid)
-        .single();
+  getUserBlob = async (uuid: string): Promise<Result<UserBlob>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('user')
+      .eq('id', uuid)
+      .single();
 
-      if (error) {
-        console.error('Error fetching from Supabase:', error);
-        throw error;
-      }
-
-      return UserBlobSchema.parse(data.user);
-    } catch (error) {
-      // On not found, fallback to legacy implementation
-      console.error('Error getting user blob from Supabase', error);
-      return undefined;
+    if (error) {
+      console.error('Error fetching user blob from Supabase', error);
+      return {
+        success: false,
+        error: error.message,
+      };
     }
+
+    const parsed = UserBlobSchema.safeParse(data.user);
+
+    if (parsed.success) {
+      return {
+        success: true,
+        data: parsed.data,
+      };
+    }
+
+    return {
+      success: false,
+      error: 'User blob not found',
+    };
   };
 
   saveUserBlob = async (uuid: string, user: UserBlob) => {
@@ -53,24 +62,38 @@ export class BlobRepository {
       .upsert({ id: uuid, user }, { onConflict: 'id' });
   };
 
-  getUserSettings = async (uuid: string): Promise<Settings | undefined> => {
-    try {
-      const { data, error } = await this.supabaseClient
-        .from(applePhotosTableName)
-        .select('settings')
-        .eq('id', uuid)
-        .single();
+  getUserSettings = async (uuid: string): Promise<Result<Settings>> => {
+    const { data, error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .select('settings')
+      .eq('id', uuid)
+      .single();
 
-      if (error) {
-        console.error('Error fetching from Supabase:', error);
-        throw error;
-      }
-
-      return SettingsSchema.parse(data.settings);
-    } catch (error) {
-      console.error('Error getting user settings from Supabase', error);
-      return undefined;
+    if (error) {
+      console.error('Error fetching user settings from Supabase', error);
+      return {
+        success: false,
+        error: error.message,
+      };
     }
+
+    const parsed = SettingsSchema.safeParse(data.settings);
+
+    if (!parsed.success) {
+      console.error(
+        'Error parsing user settings (falling back to no settings)',
+        parsed.error
+      );
+      return {
+        success: false,
+        error: parsed.error.message,
+      };
+    }
+
+    return {
+      success: true,
+      data: parsed.data,
+    };
   };
 
   saveUserSettings = async (uuid: string, settings: Settings) => {
@@ -105,7 +128,7 @@ export class BlobRepository {
 
     const newCount = currentCount.render_count + 1;
 
-    const { data, error } = await this.supabaseClient
+    const { error } = await this.supabaseClient
       .from(applePhotosTableName)
       .update({ render_count: newCount, last_render_at: new Date() })
       .eq('id', uuid);
@@ -275,7 +298,10 @@ export class BlobRepository {
   setCrawlStatus = async ({
     uuid,
     status,
-  }: { uuid: string; status: string }) => {
+  }: {
+    uuid: string;
+    status: string;
+  }) => {
     const { error } = await this.supabaseClient
       .from(applePhotosTableName)
       .update({ crawl_status: status })

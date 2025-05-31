@@ -32,7 +32,7 @@ export const crawlAlbum = async ({
   });
 
   const userSettings = await blobRepository.getUserSettings(user_uuid);
-  if (!userSettings) {
+  if (!userSettings.success) {
     logger.error('The album has not been set up yet.');
     await blobRepository.setCrawlStatus({
       uuid: user_uuid,
@@ -54,7 +54,7 @@ export const crawlAlbum = async ({
     request_partition = getPartitionAndWebStreamResult.data.apple_partition;
   }
 
-  const albumId = getPublicAlbumId(userSettings.sharedAlbumUrl);
+  const albumId = getPublicAlbumId(userSettings.data.sharedAlbumUrl);
 
   const { webStream, partition, notFound } = await fetchPublicAlbumWebStream(
     request_partition,

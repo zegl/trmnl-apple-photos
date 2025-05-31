@@ -1,13 +1,13 @@
+import {
+  ConcurrencyLimitStrategy,
+  Hatchet,
+  Priority,
+  RateLimitDuration,
+  type TaskFn,
+} from '@hatchet-dev/typescript-sdk';
 import { BlobRepository } from '@/blobs';
 import { crawlAlbum } from '@/crawl';
 import { getGenericSupabaseClient } from '@/supabase';
-import {
-  Hatchet,
-  Priority,
-  type TaskFn,
-  RateLimitDuration,
-  ConcurrencyLimitStrategy,
-} from '@hatchet-dev/typescript-sdk';
 
 export const hatchet = Hatchet.init();
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Settings, UserBlob } from './types';
+import type { Settings, UserBlob } from './types';
 
 interface AlbumFormProps {
   uuid: string;
@@ -29,7 +29,7 @@ export default function AlbumForm({
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { isDirty },
     watch,
   } = useForm<FormValues>({
     defaultValues: {
@@ -204,7 +204,7 @@ export default function AlbumForm({
         )}
       </form>
 
-      <div style={{ flex: 1 }}></div>
+      <div style={{ flex: 1 }} />
 
       <div
         style={{
