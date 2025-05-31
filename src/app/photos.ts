@@ -89,14 +89,14 @@ export const getRandomPhotoFromWebStream = async ({
 }): Promise<ImageResult> => {
   const photos = web_stream_blob.photos
     .filter((photo) => photo.mediaAssetType !== 'video')
-    .filter((photo) => Object.keys(photo.derivatives).length > 0)
-    // .filter(
-    //   (photo) =>
-    //     photo.width !== undefined &&
-    //     Number.parseInt(photo.width) > 100 &&
-    //     photo.height !== undefined &&
-    //     Number.parseInt(photo.height) > 100
-    // );
+    .filter((photo) => Object.keys(photo.derivatives).length > 0);
+  // .filter(
+  //   (photo) =>
+  //     photo.width !== undefined &&
+  //     Number.parseInt(photo.width) > 100 &&
+  //     photo.height !== undefined &&
+  //     Number.parseInt(photo.height) > 100
+  // );
 
   if (photos.length === 0) {
     return {
@@ -179,13 +179,17 @@ export const getPhotos = async ({
     const crawlResult = await crawlAlbum({
       user_uuid,
       logger: {
-      info: console.log,
-      error: console.error,
-    },
-  });
+        info: console.log,
+        error: console.error,
+      },
+    });
 
     if (crawlResult.success) {
-      return await getPhotos({ blobRepository, user_uuid, crawl_if_missing: false });
+      return await getPhotos({
+        blobRepository,
+        user_uuid,
+        crawl_if_missing: false,
+      });
     }
   }
 

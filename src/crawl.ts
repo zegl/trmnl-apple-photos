@@ -1,23 +1,26 @@
-import { fetchPublicAlbumWebStream, getPublicAlbumId } from "./app/apple-public-album";
-import { BlobRepository } from "./blobs";
-import { getSupabaseClientForUser } from "./supabase";
+import {
+  fetchPublicAlbumWebStream,
+  getPublicAlbumId,
+} from './app/apple-public-album';
+import { BlobRepository } from './blobs';
+import { getSupabaseClientForUser } from './supabase';
 
 export const crawlAlbum = async ({
-    user_uuid,
-    logger
+  user_uuid,
+  logger,
 }: {
-    user_uuid: string;
-    logger: {
-        info: (_: string) => void,
-        error: (_: string) => void,
-    }
+  user_uuid: string;
+  logger: {
+    info: (_: string) => void;
+    error: (_: string) => void;
+  };
 }): Promise<{
-    success: boolean;
-    error?: string;
+  success: boolean;
+  error?: string;
 }> => {
-    const t0 = Date.now();
+  const t0 = Date.now();
 
-  logger.info(`Refreshing album: ${JSON.stringify({user_uuid})}`);
+  logger.info(`Refreshing album: ${JSON.stringify({ user_uuid })}`);
 
   const supabase = getSupabaseClientForUser(user_uuid);
 
@@ -94,4 +97,4 @@ export const crawlAlbum = async ({
   return {
     success: true,
   };
-}
+};

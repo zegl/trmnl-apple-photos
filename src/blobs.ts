@@ -321,7 +321,7 @@ export class BlobRepository {
       .is('uninstalled_at', null)
       .not('settings', 'is', null)
       .order('web_stream_blob_fetched_at', { ascending: true })
-      .limit(10_000)
+      .limit(10_000);
 
     if (error) {
       console.error('Error listing albums to refresh', error);

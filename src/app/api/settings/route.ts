@@ -22,15 +22,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     try {
-    await hatchet.runNoWait(
-      'trmnl-apple-photos-refresh-album',
-      {
-        user_uuid: parsedBody.uuid,
-      },
-      {
-        priority: Priority.HIGH,
-      }
-    );
+      await hatchet.runNoWait(
+        'trmnl-apple-photos-refresh-album',
+        {
+          user_uuid: parsedBody.uuid,
+        },
+        {
+          priority: Priority.HIGH,
+        }
+      );
     } catch (error) {
       console.error('Error triggering hatchet refresh:', error);
     }
