@@ -16,7 +16,7 @@ export const webStreamSchema = z.object({
   streamName: z.string(),
   photos: z.array(
     z.object({
-      batchGuid: z.string(),
+      batchGuid: z.string().optional(),
       derivatives: z.record(z.string(), webStreamDerivativeSchema),
       photoGuid: z.string(),
       width: z.string().optional(),
