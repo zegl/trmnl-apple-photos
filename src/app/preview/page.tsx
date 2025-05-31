@@ -29,7 +29,7 @@ export default async function Page({
   const blobRepository = new BlobRepository(supabaseClient);
 
   const user = await blobRepository.getUserBlob(user_uuid);
-  if (!user) {
+  if (!user.success) {
     return <FullScreenMessage message="User not found :-(" />;
   }
 
@@ -53,7 +53,7 @@ export default async function Page({
 
   const { url } = photos.data;
 
-  const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.user.plugin_setting_id}/edit?force_refresh=true`;
+  const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.data.user.plugin_setting_id}/edit?force_refresh=true`;
 
   return (
     <div

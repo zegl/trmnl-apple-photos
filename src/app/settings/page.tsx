@@ -21,11 +21,14 @@ export default async function Page({
   const blobRepository = new BlobRepository(supabaseClient);
 
   const user = await blobRepository.getUserBlob(uuid);
-  if (!user) {
+  if (!user.success) {
     return <FullScreenMessage message="User not found :-(" />;
   }
 
   const settings = await blobRepository.getUserSettings(uuid);
+
+  const initialSettings = settings.success ? settings.data : undefined;
+
 
   return (
     <div
@@ -44,11 +47,11 @@ export default async function Page({
       >
         <div>
           <h1>Settings</h1>
-          <p>Hello {user.user.name}, let's get you set up.</p>
+          <p>Hello {user.data.user.name}, let's get you set up.</p>
         </div>
 
         <Suspense fallback={<div>Loading...</div>}>
-          <AlbumForm uuid={uuid} initialSettings={settings} user={user} />
+          <AlbumForm uuid={uuid} initialSettings={initialSettings} user={user.data} />
         </Suspense>
       </div>
     </div>
