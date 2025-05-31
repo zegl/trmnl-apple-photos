@@ -44,7 +44,7 @@ export default async function Page({
     ? crawlStatus.data.photos_updated_at
     : null;
   const lastUpdatedAtMessage = lastUpdatedAt
-    ? `Album last updated at: ${lastUpdatedAt.toISOString().replace('T', ' ').slice(0, 16)}`
+    ? `Album last updated at: ${lastUpdatedAt.toISOString().replace('T', ' ').slice(0, 16)} (UTC)`
     : '';
 
   const { url } = photos.data;

@@ -42,10 +42,16 @@ const webStreamOrRedirectSchema = z.union([
 
 export type PublicAlbumWebStream = z.infer<typeof webStreamSchema>;
 
+type FetchPublicAlbumWebStreamResult = {
+  webStream?: PublicAlbumWebStream;
+  partition: string;
+  notFound?: true;
+};
+
 export const fetchPublicAlbumWebStream = async (
   partition: string,
   albumId: string
-): Promise<{ webStream: PublicAlbumWebStream; partition: string }> => {
+): Promise<FetchPublicAlbumWebStreamResult> => {
   const url = `https://${partition}-sharedstreams.icloud.com/${albumId}/sharedstreams/webstream`;
   const response = await fetch(url, {
     method: 'POST',
@@ -53,6 +59,21 @@ export const fetchPublicAlbumWebStream = async (
       streamCtag: null,
     }),
   });
+
+  if (response.status === 404) {
+    return {
+      partition: partition,
+      notFound: true,
+    };
+  }
+
+  if (response.status > 399) {
+    const text = await response.text();
+    throw new Error(
+      `Failed to fetch public album web stream: url=${url} status=${response.status} text=${text}`
+    );
+  }
+
   const data = await response.json();
   const result = webStreamOrRedirectSchema.safeParse(data);
   if (!result.success) {

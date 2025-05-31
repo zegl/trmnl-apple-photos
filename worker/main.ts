@@ -23,6 +23,8 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
   executionTimeout: '10m',
   scheduleTimeout: '12h',
   fn: async (input: RefreshAlbumInput, ctx) => {
+    const t0 = Date.now();
+
     const { user_uuid } = input;
 
     ctx.logger.info(`Refreshing album: ${JSON.stringify(input)}`);
@@ -61,10 +63,15 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
 
     const albumId = getPublicAlbumId(userSettings.sharedAlbumUrl);
 
-    const { webStream, partition } = await fetchPublicAlbumWebStream(
+    const { webStream, partition, notFound } = await fetchPublicAlbumWebStream(
       request_partition,
       albumId
     );
+
+    await blobRepository.setWebStreamStatus({
+      uuid: user_uuid,
+      web_stream_status: notFound ? 'not_found' : 'found',
+    });
 
     await blobRepository.setPartitionAndWebStream({
       uuid: user_uuid,
@@ -72,7 +79,7 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
       web_stream_blob: webStream,
     });
 
-    if (webStream.photos.length === 0) {
+    if (webStream === undefined || webStream.photos.length === 0) {
       ctx.logger.error('No photos found in the shared album. :-/');
       await blobRepository.setCrawlStatus({
         uuid: user_uuid,
@@ -90,6 +97,9 @@ export const trmnlApplePhotosRefreshAlbum = hatchet.task({
       uuid: user_uuid,
       status: 'Updated',
     });
+
+    const t1 = Date.now();
+    ctx.logger.info(`Refresh took ${t1 - t0}ms`);
 
     return {
       success: true,
@@ -109,7 +119,7 @@ onCron.task({
   fn: async (_, ctx) => {
     const supabase = getGenericSupabaseClient();
     const blobRepository = new BlobRepository(supabase);
-    const users = await blobRepository.listAllUsers();
+    const users = await blobRepository.listAlbumsToRefresh();
 
     if (!users.success) {
       throw new Error('Error listing all users', { cause: users.error });
@@ -135,7 +145,7 @@ async function main() {
 
   const worker = await hatchet.worker('trmnl-apple-photos-worker', {
     workflows: [trmnlApplePhotosRefreshAlbum, onCron],
-    slots: 2,
+    slots: 5,
   });
 
   console.log('Starting worker');

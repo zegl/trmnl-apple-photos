@@ -21,6 +21,8 @@ const PhotosSchema = z.object({
 
 type Photos = z.infer<typeof PhotosSchema>;
 
+type WebStreamStatus = 'not_found' | 'found' | 'error';
+
 export class BlobRepository {
   constructor(private readonly supabaseClient: SupabaseClient) {}
 
@@ -114,6 +116,24 @@ export class BlobRepository {
     }
   };
 
+  setWebStreamStatus = async ({
+    uuid,
+    web_stream_status,
+  }: {
+    uuid: string;
+    web_stream_status: WebStreamStatus;
+  }) => {
+    const { error } = await this.supabaseClient
+      .from(applePhotosTableName)
+      .update({ web_stream_status })
+      .eq('id', uuid);
+
+    if (error) {
+      console.error('Error setting web stream status', error);
+      throw error;
+    }
+  };
+
   setPartitionAndWebStream = async ({
     uuid,
     apple_partition,
@@ -121,13 +141,13 @@ export class BlobRepository {
   }: {
     uuid: string;
     apple_partition: string;
-    web_stream_blob: PublicAlbumWebStream;
+    web_stream_blob: PublicAlbumWebStream | undefined;
   }) => {
     const { error } = await this.supabaseClient
       .from(applePhotosTableName)
       .update({
         apple_partition,
-        web_stream_blob,
+        web_stream_blob: web_stream_blob ?? null,
         web_stream_blob_fetched_at: new Date(),
       })
       .eq('id', uuid);
@@ -294,12 +314,13 @@ export class BlobRepository {
     };
   };
 
-  listAllUsers = async (): Promise<Result<string[]>> => {
+  listAlbumsToRefresh = async (): Promise<Result<string[]>> => {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)
       .select('id')
       .is('uninstalled_at', null)
-      .not('settings', 'is', null);
+      .not('settings', 'is', null)
+      .not('web_stream_status', 'is', 'not_found');
 
     if (error) {
       return {
