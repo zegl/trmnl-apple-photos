@@ -21,7 +21,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       status: 'Refresh scheduled',
     });
 
-    // Trigger hatchet refresh
+    try {
     await hatchet.runNoWait(
       'trmnl-apple-photos-refresh-album',
       {
@@ -31,6 +31,9 @@ export async function POST(request: Request): Promise<NextResponse> {
         priority: Priority.HIGH,
       }
     );
+    } catch (error) {
+      console.error('Error triggering hatchet refresh:', error);
+    }
 
     return NextResponse.json({
       status: 'success',

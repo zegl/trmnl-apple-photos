@@ -3,6 +3,7 @@ import {
   getPublicAlbumId,
 } from '@/app/apple-public-album';
 import { BlobRepository } from '@/blobs';
+import { crawlAlbum } from '@/crawl';
 import { getGenericSupabaseClient, getSupabaseClientForUser } from '@/supabase';
 import { Hatchet, Priority, type TaskFn, type Context, RateLimitDuration, ConcurrencyLimitStrategy } from '@hatchet-dev/typescript-sdk';
 import { Concurrency } from '@hatchet-dev/typescript-sdk/protoc/v1/workflows';
@@ -20,87 +21,11 @@ export type RefreshAlbumOutput = {
 };
 
 const refreshAlbumFn: TaskFn<RefreshAlbumInput, RefreshAlbumOutput> = async (input, ctx) => {
-  const t0 = Date.now();
-
   const { user_uuid } = input;
-
-  ctx.logger.info(`Refreshing album: ${JSON.stringify(input)}`);
-
-  const supabase = getSupabaseClientForUser(user_uuid);
-
-  const blobRepository = new BlobRepository(supabase);
-
-  await blobRepository.setCrawlStatus({
-    uuid: user_uuid,
-    status: 'Refresh started',
+  return await crawlAlbum({
+    user_uuid,
+    logger: ctx.logger,
   });
-
-  const userSettings = await blobRepository.getUserSettings(user_uuid);
-  if (!userSettings) {
-    ctx.logger.error('The album has not been set up yet.');
-    await blobRepository.setCrawlStatus({
-      uuid: user_uuid,
-      status: 'Refresh failed, album not set up',
-    });
-    return {
-      success: false,
-      error: 'The album has not been set up yet.',
-    };
-  }
-
-  const getPartitionAndWebStreamResult =
-    await blobRepository.getPartitionAndWebStream(user_uuid);
-  let request_partition = 'p123';
-  if (
-    getPartitionAndWebStreamResult.success &&
-    getPartitionAndWebStreamResult.data.apple_partition
-  ) {
-    request_partition = getPartitionAndWebStreamResult.data.apple_partition;
-  }
-
-  const albumId = getPublicAlbumId(userSettings.sharedAlbumUrl);
-
-  const { webStream, partition, notFound } = await fetchPublicAlbumWebStream(
-    request_partition,
-    albumId
-  );
-
-  await blobRepository.setWebStreamStatus({
-    uuid: user_uuid,
-    web_stream_status: notFound ? 'not_found' : 'found',
-  });
-
-  await blobRepository.setPartitionAndWebStream({
-    uuid: user_uuid,
-    apple_partition: partition,
-    web_stream_blob: webStream,
-  });
-
-  if (webStream === undefined || webStream.photos.length === 0) {
-    ctx.logger.error('No photos found in the shared album. :-/');
-    await blobRepository.setCrawlStatus({
-      uuid: user_uuid,
-      status: 'Refresh failed, no photos found',
-    });
-    return {
-      success: false,
-      error: 'No photos found in the shared album. :-/',
-    };
-  }
-
-  ctx.logger.info(`Fetched ${webStream.photos.length} photos`);
-
-  await blobRepository.setCrawlStatus({
-    uuid: user_uuid,
-    status: 'Updated',
-  });
-
-  const t1 = Date.now();
-  ctx.logger.info(`Refresh took ${t1 - t0}ms`);
-
-  return {
-    success: true,
-  };
 };
 
 export const trmnlApplePhotosRefreshAlbum = hatchet.task({

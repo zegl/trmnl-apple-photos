@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   const supabaseClient = getSupabaseClientForUser(user_uuid);
   const blobRepository = new BlobRepository(supabaseClient);
 
-  const photos = await getPhotos({ blobRepository, user_uuid });
+  const photos = await getPhotos({ blobRepository, user_uuid, crawl_if_missing: true });
 
   if (photos.success) {
     const { url } = photos.data;

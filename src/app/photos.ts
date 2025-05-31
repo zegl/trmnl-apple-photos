@@ -7,6 +7,7 @@ import {
 } from './apple-public-album';
 import type { Result } from '@/result';
 import type { Settings } from './settings/types';
+import { crawlAlbum } from '@/crawl';
 
 type ImageResult = Result<{
   url: string;
@@ -133,9 +134,11 @@ export const getRandomPhotoFromWebStream = async ({
 export const getPhotos = async ({
   blobRepository,
   user_uuid,
+  crawl_if_missing,
 }: {
   blobRepository: BlobRepository;
   user_uuid: string;
+  crawl_if_missing: boolean;
 }): Promise<ImageResult> => {
   const settings = await blobRepository.getUserSettings(user_uuid);
   if (!settings) {
@@ -169,6 +172,21 @@ export const getPhotos = async ({
       success: false,
       error: imageFromCachedWebStream.error,
     };
+  }
+
+  // Try on-demand crawl
+  if (crawl_if_missing) {
+    const crawlResult = await crawlAlbum({
+      user_uuid,
+      logger: {
+      info: console.log,
+      error: console.error,
+    },
+  });
+
+    if (crawlResult.success) {
+      return await getPhotos({ blobRepository, user_uuid, crawl_if_missing: false });
+    }
   }
 
   return {
