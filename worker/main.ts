@@ -165,6 +165,7 @@ async function main() {
     workflows: [
       trmnlApplePhotosRefreshAlbum,
       trmnlApplePhotosRefreshAlbumCron,
+      trmnlApplePhotosRefreshAlbumCronBulk,
       onCron,
     ],
     slots: 20,
