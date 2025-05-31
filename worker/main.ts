@@ -152,6 +152,13 @@ onCron.task({
   },
 });
 
+const getHostname = () => {
+  if (process.env.FLY_APP_NAME && process.env.FLY_MACHINE_ID) {
+    return `${process.env.FLY_APP_NAME}-${process.env.FLY_MACHINE_ID}`;
+  }
+  return 'trmnl-apple-photos-worker';
+};
+
 async function main() {
   console.log('Registering worker');
 
@@ -161,7 +168,9 @@ async function main() {
     duration: RateLimitDuration.MINUTE,
   });
 
-  const worker = await hatchet.worker('trmnl-apple-photos-worker', {
+  const hostname = getHostname();
+
+  const worker = await hatchet.worker(hostname, {
     workflows: [
       trmnlApplePhotosRefreshAlbum,
       trmnlApplePhotosRefreshAlbumCron,
