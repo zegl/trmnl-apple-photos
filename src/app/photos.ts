@@ -44,7 +44,7 @@ const tryCrawlNewImage = async ({
     web_stream_blob: webStream,
   });
 
-  if (webStream.photos.length === 0) {
+  if (!webStream || webStream.photos.length === 0) {
     return {
       success: false,
       error: 'No photos found in the shared album. :-/',
