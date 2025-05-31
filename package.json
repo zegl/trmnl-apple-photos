@@ -11,7 +11,9 @@
     "format:check": "biome format .",
     "lint:biome": "biome check .",
     "lint:biome:fix": "biome check --apply.",
-    "start:worker": "tsx worker/main.ts"
+    "worker:start": "tsx worker/main.ts",
+    "worker:build": "tsc -p tsconfig.worker.json",
+    "worker:start-built": "node dist/worker/worker/main.js"
   },
   "dependencies": {
     "@hatchet-dev/typescript-sdk": "^1.6.3",

@@ -14,5 +14,8 @@ RUN pnpm install
 # Copy the rest of the application
 COPY . .
 
+# Build the worker
+RUN pnpm worker:build
+
 # Start the application
-CMD ["pnpm", "start:worker"]
+CMD ["pnpm", "worker:start-built"]
