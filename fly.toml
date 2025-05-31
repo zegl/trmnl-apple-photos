@@ -4,8 +4,9 @@ primary_region = 'arn'
 [build]
   dockerfile = "Dockerfile"
 
+[deploy]
+  strategy = "rolling"
+  max_unavailable = 1
+
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
-  memory_mb = 1024
+  size = "shared-cpu-1x"
