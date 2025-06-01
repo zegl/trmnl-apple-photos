@@ -98,7 +98,7 @@ export const trmnlApplePhotosRefreshAlbumCron = hatchet.task({
 export const trmnlApplePhotosRefreshAlbumCronBulk = hatchet.task({
   name: 'trmnl-apple-photos-refresh-album-cron-bulk',
   retries: 2,
-  executionTimeout: '10m',
+  executionTimeout: '6h',
   scheduleTimeout: '12h',
   concurrency: [
     {
