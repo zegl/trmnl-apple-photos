@@ -18,7 +18,7 @@ export default function Home() {
             Like this plugin? Please consider{' '}
             <a
               style={{ textDecoration: 'underline' }}
-              href="https://polar.sh/checkout/polar_c_nDQaEaCrajSTvlrMmJsbkyoNjCe3hLbaUxAXt1nHgem"
+              href="https://buy.polar.sh/polar_cl_I7pc5Mh2nCfQk3cyLow5mxm6qg0ncpb3Ru8bu0qRKzy"
             >
               donating
             </a>{' '}
