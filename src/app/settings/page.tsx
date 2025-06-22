@@ -29,7 +29,6 @@ export default async function Page({
 
   const initialSettings = settings.success ? settings.data : undefined;
 
-
   return (
     <div
       className="screen"
@@ -51,7 +50,11 @@ export default async function Page({
         </div>
 
         <Suspense fallback={<div>Loading...</div>}>
-          <AlbumForm uuid={uuid} initialSettings={initialSettings} user={user.data} />
+          <AlbumForm
+            uuid={uuid}
+            initialSettings={initialSettings}
+            user={user.data}
+          />
         </Suspense>
       </div>
     </div>

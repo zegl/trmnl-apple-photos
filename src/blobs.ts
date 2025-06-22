@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { z } from 'zod';
 import {
   type PublicAlbumWebStream,
   webStreamSchema,
@@ -13,13 +12,6 @@ import {
 import type { Result } from './result';
 
 const applePhotosTableName = 'trmnl_apple_photos';
-
-const PhotosSchema = z.object({
-  uuids: z.array(z.string()).optional(),
-  urls: z.array(z.string()).optional(),
-});
-
-type Photos = z.infer<typeof PhotosSchema>;
 
 type WebStreamStatus = 'not_found' | 'found' | 'error';
 
@@ -254,47 +246,6 @@ export class BlobRepository {
     };
   };
 
-  getPhotos = async (uuid: string): Promise<Result<Photos>> => {
-    const { data, error } = await this.supabaseClient
-      .from(applePhotosTableName)
-      .select('photos')
-      .eq('id', uuid)
-      .single();
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-
-    const parsed = PhotosSchema.safeParse(data.photos);
-
-    if (!parsed.success) {
-      return {
-        success: false,
-        error: parsed.error.message,
-      };
-    }
-
-    return {
-      success: true,
-      data: parsed.data,
-    };
-  };
-
-  setPhotos = async ({ uuid, photos }: { uuid: string; photos: Photos }) => {
-    const { error } = await this.supabaseClient
-      .from(applePhotosTableName)
-      .update({ photos, photos_updated_at: new Date() })
-      .eq('id', uuid);
-
-    if (error) {
-      console.error('Error setting photos', error);
-      throw error;
-    }
-  };
-
   setCrawlStatus = async ({
     uuid,
     status,
@@ -315,10 +266,12 @@ export class BlobRepository {
 
   getCrawlStatus = async (
     uuid: string
-  ): Promise<Result<{ status: string; photos_updated_at: Date | null }>> => {
+  ): Promise<
+    Result<{ status: string; web_stream_blob_fetched_at: Date | null }>
+  > => {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)
-      .select('crawl_status, photos_updated_at')
+      .select('crawl_status, web_stream_blob_fetched_at')
       .eq('id', uuid)
       .single();
 
@@ -333,8 +286,8 @@ export class BlobRepository {
       success: true,
       data: {
         status: data.crawl_status,
-        photos_updated_at: data.photos_updated_at
-          ? new Date(data.photos_updated_at)
+        web_stream_blob_fetched_at: data.web_stream_blob_fetched_at
+          ? new Date(data.web_stream_blob_fetched_at)
           : null,
       },
     };

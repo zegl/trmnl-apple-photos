@@ -21,7 +21,6 @@ if (!supabaseJwtSecret) {
   throw new Error('Supabase JWT secret is missing');
 }
 
-
 export const getSupabaseClientForUser = (_user_uuid: string) => {
   return createClient(supabaseUrl, supabaseKey);
 };

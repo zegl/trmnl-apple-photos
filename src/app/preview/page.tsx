@@ -45,7 +45,7 @@ export default async function Page({
   const crawlStatus = await blobRepository.getCrawlStatus(user_uuid);
 
   const lastUpdatedAt = crawlStatus.success
-    ? crawlStatus.data.photos_updated_at
+    ? crawlStatus.data.web_stream_blob_fetched_at
     : null;
   const lastUpdatedAtMessage = lastUpdatedAt
     ? `Album last updated at: ${lastUpdatedAt.toISOString().replace('T', ' ').slice(0, 16)} (UTC)`
