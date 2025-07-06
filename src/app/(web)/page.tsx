@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import exampleImage from './example.png';
 
 export const metadata: Metadata = {
-  title: 'Apple Photos',
+  title: 'Apple Photos for TRMNL',
   description: 'Display images from Apple Photos on TRMNL',
+  authors: [{ name: 'Gustav Westling', url: 'https://westling.dev' }],
 };
 
 export default function Home() {

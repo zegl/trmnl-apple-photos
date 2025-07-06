@@ -7,7 +7,7 @@ import AlbumForm from './AlbumForm';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Apple Photos',
+  title: 'Apple Photos for TRMNL',
   description: 'Display images from Apple Photos on TRMNL',
 };
 
