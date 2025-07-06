@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import exampleImage from './example.png';
 
 export const metadata: Metadata = {
   title: 'Apple Photos',
@@ -8,26 +9,54 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        Hello. Install this plugin from{' '}
+      <p>
+        Hey! This is a plugin for TRMNL, that displays a random photo from a
+        Apple Photos album.
+      </p>
+
+      <img
+        src={exampleImage.src}
+        height={exampleImage.height}
+        width={exampleImage.width}
+        alt="Picture of a bird, as shown using the Apple Photos plugin on a TRMNL device"
+      />
+
+      <p>
+        Install the plugin from{' '}
         <a
-          style={{ textDecoration: 'underline' }}
+          className="text-blue-500"
           href="https://usetrmnl.com/plugin_settings/new?keyname=apple_photos"
         >
           the TRMNL plugin page
         </a>
         .
-      </div>
+      </p>
 
-      <div>
-        Bugs?{' '}
+      <p>
+        No bugs?{' '}
         <a
-          style={{ textDecoration: 'underline' }}
+          className="text-blue-500"
+          href="https://buy.polar.sh/polar_cl_I7pc5Mh2nCfQk3cyLow5mxm6qg0ncpb3Ru8bu0qRKzy"
+        >
+          Donate
+        </a>{' '}
+        to support it's development. ❤️
+      </p>
+
+      <p>
+        Bugs? Open an{' '}
+        <a
+          className="text-blue-500"
           href="https://github.com/zegl/trmnl-apple-photos"
         >
-          Open an issue on GitHub
-        </a>
-      </div>
+          issue
+        </a>{' '}
+        on GitHub 💚
+      </p>
+
+      <p className="text-sm text-gray-500">
+        This plugin is not affiliated with Apple or Apple Photos.
+      </p>
     </div>
   );
 }

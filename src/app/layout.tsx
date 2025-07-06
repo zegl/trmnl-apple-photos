@@ -5,7 +5,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="environment trmnl">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
