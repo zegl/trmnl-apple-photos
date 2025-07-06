@@ -3,7 +3,7 @@ export default function Render({
   size,
   show_message,
 }: {
-  url: string;
+  url?: string;
   size: string;
   show_message?: string;
 }) {
