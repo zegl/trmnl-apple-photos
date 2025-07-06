@@ -18,14 +18,17 @@
   "dependencies": {
     "@hatchet-dev/typescript-sdk": "^1.6.3",
     "@supabase/supabase-js": "^2.49.4",
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/jsonwebtoken": "^9.0.9",
     "@vercel/blob": "^1.0.1",
     "@vercel/edge-config": "^1.4.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.2",
+    "postcss": "^8.5.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",
+    "tailwindcss": "^4.1.11",
     "tsx": "^4.19.4",
     "zod": "^3.24.4"
   },

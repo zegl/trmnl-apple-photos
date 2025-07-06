@@ -1,8 +1,17 @@
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
-import FullScreenMessage from '../FullScreenMessage';
-import { getPhotos } from '../photos';
-import Render from '../Render';
+import FullScreenMessage from '../../FullScreenMessage';
+import { getPhotos } from '../../photos';
+import Render from '../../Render';
+import './trmnl-mini.css';
+import LinkButton from '../LinkButton';
+
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Apple Photos',
+  description: 'Display images from Apple Photos on TRMNL',
+};
 
 export default async function Page({
   searchParams,
@@ -56,48 +65,40 @@ export default async function Page({
   const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.data.user.plugin_setting_id}/edit?force_refresh=true`;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        padding: '10px',
-        background: '#eee',
-      }}
-    >
+    <div className="flex flex-col gap-4">
       <p>
         Preview of your album, in the different plugin sizes. Reload the page to
         see a new picture.
       </p>
 
-      <a href={`/settings?uuid=${user_uuid}`} className="button">
-        Plugin Settings
-      </a>
+      <div className="flex flex-row gap-4">
+        <LinkButton href={backToTrmnlUrl}>↩️ Back to TRMNL</LinkButton>
 
-      <a href={backToTrmnlUrl} className="button">
-        Back to TRMNL
-      </a>
+        <LinkButton href={`/settings?uuid=${user_uuid}`}>
+          ⚙️ Plugin Settings
+        </LinkButton>
+      </div>
 
       {lastUpdatedAtMessage && <p>{lastUpdatedAtMessage}</p>}
 
-      <h1>full</h1>
+      <h2 className="text-lg text-gray-500">full</h2>
 
-      <div className="screen">
+      <div className="screen !bg-gray-100">
         <Render url={url} size="full" />
       </div>
 
-      <h1>half_vertical</h1>
-      <div className="screen">
+      <h2 className="text-lg text-gray-500">half_vertical</h2>
+      <div className="screen !bg-gray-100">
         <Render url={url} size="half_vertical" />
       </div>
 
-      <h1>half_horizontal</h1>
-      <div className="screen">
+      <h2 className="text-lg text-gray-500">half_horizontal</h2>
+      <div className="screen !bg-gray-100">
         <Render url={url} size="half_horizontal" />
       </div>
 
-      <h1>quadrant</h1>
-      <div className="screen">
+      <h2 className="text-lg text-gray-500">quadrant</h2>
+      <div className="screen !bg-gray-100">
         <Render url={url} size="quadrant" />
       </div>
     </div>

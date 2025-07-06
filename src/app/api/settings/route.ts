@@ -1,6 +1,6 @@
 import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
 import { NextResponse } from 'next/server';
-import { SettingsSchema } from '@/app/settings/types';
+import { SettingsSchema } from '@/app/types';
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 

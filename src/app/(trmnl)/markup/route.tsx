@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
-import { getPhotos } from '../photos';
+import { getPhotos } from '../../photos';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data

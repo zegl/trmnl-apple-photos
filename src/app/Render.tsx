@@ -14,7 +14,6 @@ export default function Render({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-
         padding: size === 'full' ? '0px' : '3px',
       }}
     >

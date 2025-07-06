@@ -1,8 +1,15 @@
 import { Suspense } from 'react';
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
-import FullScreenMessage from '../FullScreenMessage';
+import FullScreenMessage from '../../FullScreenMessage';
 import AlbumForm from './AlbumForm';
+
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Apple Photos',
+  description: 'Display images from Apple Photos on TRMNL',
+};
 
 export default async function Page({
   searchParams,
@@ -30,33 +37,19 @@ export default async function Page({
   const initialSettings = settings.success ? settings.data : undefined;
 
   return (
-    <div
-      className="screen"
-      style={{
-        background: 'white',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          width: '100%',
-        }}
-      >
-        <div>
-          <h1>Settings</h1>
-          <p>Hello {user.data.user.name}, let's get you set up.</p>
-        </div>
+    <div className="flex flex-col gap-4 w-full">
+      <p>
+        Hello <strong className="text-gray-900">{user.data.user.name}</strong>,
+        let's get you set up!
+      </p>
 
-        <Suspense fallback={<div>Loading...</div>}>
-          <AlbumForm
-            uuid={uuid}
-            initialSettings={initialSettings}
-            user={user.data}
-          />
-        </Suspense>
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <AlbumForm
+          uuid={uuid}
+          initialSettings={initialSettings}
+          user={user.data}
+        />
+      </Suspense>
     </div>
   );
 }

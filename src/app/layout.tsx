@@ -5,13 +5,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://usetrmnl.com/css/latest/plugins.css"
-        />
-        <script src="https://usetrmnl.com/js/latest/plugins.js" />
-      </head>
       <body className="environment trmnl">{children}</body>
     </html>
   );

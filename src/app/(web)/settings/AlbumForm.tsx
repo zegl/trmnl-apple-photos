@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { Settings, UserBlob } from './types';
+import type { Settings, UserBlob } from '../../types';
+import LinkButton from '../LinkButton';
 
 interface AlbumFormProps {
   uuid: string;
@@ -25,6 +26,9 @@ export default function AlbumForm({
     type: 'success' | 'error';
   } | null>(null);
   const [didSaveNewAlbum, setDidSaveNewAlbum] = useState(false);
+  const [hasAlbumUrl, setHasAlbumUrl] = useState(
+    !!initialSettings?.sharedAlbumUrl
+  );
 
   const {
     register,
@@ -73,6 +77,7 @@ export default function AlbumForm({
 
       if (response.ok) {
         setDidSaveNewAlbum(true);
+        setHasAlbumUrl(true);
       } else {
         setMessage({
           text: `Error: ${result.error || 'Failed to save settings'}`,
@@ -102,12 +107,7 @@ export default function AlbumForm({
     >
       <h2>Album Settings</h2>
 
-      <ol
-        style={{
-          color: '#666',
-          paddingLeft: '20px',
-        }}
-      >
+      <ol className="list-decimal text-gray-500 pl-4">
         <li>
           <p>
             Setup a "Shared Album" in iCloud / Apple Photos &mdash; How to:{' '}
@@ -134,74 +134,72 @@ export default function AlbumForm({
         </li>
       </ol>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '10px',
-          }}
-        >
-          <input
-            style={{
-              width: '100%',
-            }}
-            type="text"
-            id="sharedAlbumUrl"
-            placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
-            className="settings-input"
-            {...register('sharedAlbumUrl', {
-              validate: sharedAlbumUrlValidator,
-            })}
-          />
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            style={{
-              width: '100px',
-            }}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="sm:col-span-4">
+          <label
+            htmlFor="sharedAlbumUrl"
+            className="block text-sm/6 font-medium text-gray-900"
           >
-            {isSubmitting ? 'Saving...' : 'Save Album'}
-          </button>
+            Album URL
+          </label>
+          <div className="mt-2">
+            <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-600">
+              <input
+                id="sharedAlbumUrl"
+                type="text"
+                placeholder="https://www.icloud.com/sharedalbum/#AlbumID"
+                value={sharedAlbumUrl}
+                {...register('sharedAlbumUrl', {
+                  validate: sharedAlbumUrlValidator,
+                })}
+                className="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          {isDirty && !isUrlValid && (
+            <div className="text-red-500 text-sm mt-2 bg-red-50 p-4">
+              The URL does not look like a valid shared album URL.
+            </div>
+          )}
         </div>
 
         {didSaveNewAlbum && (
-          <div
-            style={{
-              color: 'darkgreen',
-              fontSize: '14px',
-            }}
-          >
+          <div className="text-green-500 text-sm mt-2 bg-green-50 p-4">
             Album settings saved successfully! It make take a minute or two to
-            process it.{' '}
-            <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
-              Preview Album
-            </a>
-          </div>
-        )}
-
-        {isDirty && !isUrlValid && (
-          <div
-            style={{
-              color: 'red',
-              fontSize: '14px',
-            }}
-          >
-            The URL does not look like a valid shared album URL.
+            process it.
           </div>
         )}
 
         {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
+          <>
+            {message.type === 'success' && (
+              <div className="text-green-500 text-sm mt-2">{message.text}</div>
+            )}
+            {message.type === 'error' && (
+              <div className="text-red-500 text-sm mt-2">{message.text}</div>
+            )}
+          </>
         )}
+
+        <div className="flex flex-row gap-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="cursor-pointer rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          >
+            {isSubmitting ? 'Saving...' : 'Save Album'}
+          </button>
+
+          {hasAlbumUrl && (
+            <a
+              href={`/preview?user_uuid=${uuid}`}
+              className="cursor-pointer rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            >
+              👀 Preview Album
+            </a>
+          )}
+        </div>
       </form>
 
       <div style={{ flex: 1 }} />
@@ -213,15 +211,7 @@ export default function AlbumForm({
           gap: '40px',
         }}
       >
-        <a href={backToTrmnlUrl} className="button">
-          Back to TRMNL
-        </a>
-
-        {initialSettings?.sharedAlbumUrl && (
-          <a href={`/preview?user_uuid=${uuid}&size=full`} className="button">
-            Preview Album
-          </a>
-        )}
+        <LinkButton href={backToTrmnlUrl}>↩️ Back to TRMNL</LinkButton>
       </div>
     </div>
   );

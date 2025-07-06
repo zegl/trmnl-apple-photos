@@ -8,7 +8,7 @@ import {
   SettingsSchema,
   type UserBlob,
   UserBlobSchema,
-} from './app/settings/types';
+} from './app/types';
 import type { Result } from './result';
 
 const applePhotosTableName = 'trmnl_apple_photos';

@@ -1,0 +1,66 @@
+:root {
+    --screen-w: 800px;
+    --screen-w-v2: 1200px;
+    --screen-h: 480px;
+    --screen-h-v2: 825px;
+    --gap-xsmall: 5px;
+    --gap-small: 7px;
+    --gap: 10px;
+    --gap-medium: 16px;
+    --gap-large: 20px;
+    --gap-xlarge: 30px;
+    --gap-xxlarge: 40px;
+    --list-gap-small: 8px;
+    --list-gap-large: 16px;
+    --title_bar-h: 40px;
+    --title_bar-small-h: 32px;
+    --full-w: calc(var(--screen-w) - var(--gap) * 2);
+    --full-h: calc(var(--screen-h) - var(--gap) * 2);
+    --quadrant-w: calc((var(--screen-w) - var(--gap) * 2) / 2 - var(--gap) / 2);
+    --quadrant-h: calc((var(--screen-h) - var(--gap) * 2) / 2 - var(--gap) / 2);
+    --half_vertical-w: calc((var(--screen-w) - var(--gap) * 2) / 2 - var(--gap) / 2);
+    --half_vertical-h: calc((var(--screen-h) - var(--gap) * 2));
+    --half_horizontal-w: calc((var(--screen-w) - var(--gap) * 2));
+    --half_horizontal-h: calc((var(--screen-h) - var(--gap) * 2) / 2 - var(--gap) / 2);
+    --black: #000;
+    --gray-1: #2a2a2a;
+    --gray-2: #545454;
+    --gray-3: #7e7e7e;
+    --gray-4: #a8a8a8;
+    --gray-5: #d2d2d2;
+    --white: #fff;
+}
+
+.trmnl .screen {
+    width: var(--screen-w);
+    height: var(--screen-h);
+    padding: var(--gap);
+    background-color: #fff;
+    display: flex;
+}
+
+.trmnl .view {
+    flex-direction: column;
+    display: flex;
+    position: relative;
+}
+
+.trmnl .view--full {
+    width: var(--full-w);
+    height: var(--full-h);
+}
+
+.trmnl .view--half_vertical {
+    width: var(--half_vertical-w);
+    height: var(--half_vertical-h);
+}
+
+.trmnl .view--half_horizontal {
+    width: var(--half_horizontal-w);
+    height: var(--half_horizontal-h);
+}
+
+.trmnl .view--quadrant {
+    width: var(--quadrant-w);
+    height: var(--quadrant-h);
+}

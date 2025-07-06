@@ -1,5 +1,5 @@
-import FullScreenMessage from '../FullScreenMessage';
-import Render from '../Render';
+import FullScreenMessage from '../../FullScreenMessage';
+import Render from '../../Render';
 
 export default async function Page({
   searchParams,

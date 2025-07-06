@@ -7,7 +7,7 @@ import {
   getPublicAlbumId,
   type PublicAlbumWebStream,
 } from './apple-public-album';
-import type { Settings } from './settings/types';
+import type { Settings } from './types';
 
 type ImageResult = Result<{
   url: string;
