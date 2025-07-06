@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { getPhotos } from '../../photos';
+import Render from '@/app/Render';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -46,32 +47,33 @@ export async function POST(request: Request) {
     crawl_if_missing: true,
   });
 
-  if (photos.success) {
-    const { url } = photos.data;
-    params.append('url', url);
-  } else {
-    params.append('show_message', photos.error);
-  }
+  const show_message = photos.success ? undefined : photos.error;
+  const url = photos.success ? photos.data.url : undefined;
 
   await blobRepository.increaseRenderCount(user_uuid);
 
+  const { renderToString } = await import('react-dom/server');
+
   const res = await Promise.all(
     sizes.map(async (size) => {
-      const url = new URL('/markup-get', request.url);
-
-      // Copy params to url.searchParams
-      for (const [key, value] of params.entries()) {
-        url.searchParams.append(key, value);
-      }
-      url.searchParams.append('size', size.size);
-
-      const response = await fetch(url, {
-        method: 'GET',
-      });
+      const markup = renderToString(
+        <html lang="en">
+          <head>
+            <script src="https://usetrmnl.com/js/latest/plugins.js" />
+            <link
+              rel="stylesheet"
+              href="https://usetrmnl.com/css/latest/plugins.css"
+            />
+          </head>
+          <body className="environment trmnl">
+            <Render url={url} size={size.size} show_message={show_message} />
+          </body>
+        </html>
+      );
 
       return {
         json_name: size.json_name,
-        markup: await response.text(),
+        markup: markup,
       };
     })
   );
