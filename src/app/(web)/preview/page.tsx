@@ -83,23 +83,22 @@ export default async function Page({
 
       <h2 className="text-lg text-gray-500">full</h2>
 
-      <div className="screen !bg-gray-100 environment trmnl">
-
+      <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <Render url={url} size="full" />
       </div>
 
       <h2 className="text-lg text-gray-500">half_vertical</h2>
-      <div className="screen !bg-gray-100 environment trmnl">
+      <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <Render url={url} size="half_vertical" />
       </div>
 
       <h2 className="text-lg text-gray-500">half_horizontal</h2>
-      <div className="screen !bg-gray-100 environment trmnl">
+      <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <Render url={url} size="half_horizontal" />
       </div>
 
       <h2 className="text-lg text-gray-500">quadrant</h2>
-      <div className="screen !bg-gray-100 environment trmnl">
+      <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <Render url={url} size="quadrant" />
       </div>
     </div>
