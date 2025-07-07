@@ -1,5 +1,5 @@
-import type { BlobRepository } from '@/blobs';
-import { crawlAlbum } from '@/crawl';
+import type { AppleBlobRepository } from '@/apple/blobs';
+import { crawlAlbum } from '@/apple/crawl';
 import type { Result } from '@/result';
 import {
   fetchPublicAlbumWebAsset,
@@ -14,16 +14,16 @@ type ImageResult = Result<{
 }>;
 
 const _tryCrawlNewImage = async ({
-  blobRepository,
+  appleBlobRepository,
   user_uuid,
   settings,
 }: {
-  blobRepository: BlobRepository;
+  appleBlobRepository: AppleBlobRepository;
   user_uuid: string;
   settings: Settings;
 }): Promise<ImageResult> => {
   const getPartitionAndWebStreamResult =
-    await blobRepository.getPartitionAndWebStream(user_uuid);
+    await appleBlobRepository.getPartitionAndWebStream(user_uuid);
   let request_partition = 'p123';
   if (
     getPartitionAndWebStreamResult.success &&
@@ -39,7 +39,7 @@ const _tryCrawlNewImage = async ({
     albumId
   );
 
-  await blobRepository.setPartitionAndWebStream({
+  await appleBlobRepository.setPartitionAndWebStream({
     uuid: user_uuid,
     apple_partition: partition,
     web_stream_blob: webStream,
@@ -132,15 +132,15 @@ export const getRandomPhotoFromWebStream = async ({
 };
 
 export const getPhotos = async ({
-  blobRepository,
+  appleBlobRepository,
   user_uuid,
   crawl_if_missing,
 }: {
-  blobRepository: BlobRepository;
+  appleBlobRepository: AppleBlobRepository;
   user_uuid: string;
   crawl_if_missing: boolean;
 }): Promise<ImageResult> => {
-  const settings = await blobRepository.getUserSettings(user_uuid);
+  const settings = await appleBlobRepository.getUserSettings(user_uuid);
   if (!settings.success) {
     return {
       success: false,
@@ -150,7 +150,7 @@ export const getPhotos = async ({
 
   // If we have a web stream blob, use it to get a random photo
   const webStreamResult =
-    await blobRepository.getPartitionAndWebStream(user_uuid);
+    await appleBlobRepository.getPartitionAndWebStream(user_uuid);
 
   if (
     webStreamResult.success &&
@@ -184,7 +184,7 @@ export const getPhotos = async ({
 
     if (crawlResult.success) {
       return await getPhotos({
-        blobRepository,
+        appleBlobRepository,
         user_uuid,
         crawl_if_missing: false,
       });

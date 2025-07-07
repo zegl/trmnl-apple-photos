@@ -1,9 +1,9 @@
 import {
   fetchPublicAlbumWebStream,
   getPublicAlbumId,
-} from './app/apple-public-album';
-import { BlobRepository } from './blobs';
-import { getSupabaseClientForUser } from './supabase';
+} from '@/app/apple-public-album';
+import { AppleBlobRepository } from '@/apple/blobs';
+import { getSupabaseClientForUser } from '@/supabase';
 
 export const crawlAlbum = async ({
   user_uuid,
@@ -24,17 +24,17 @@ export const crawlAlbum = async ({
 
   const supabase = getSupabaseClientForUser(user_uuid);
 
-  const blobRepository = new BlobRepository(supabase);
+  const appleBlobRepository = new AppleBlobRepository(supabase);
 
-  await blobRepository.setCrawlStatus({
+  await appleBlobRepository.setCrawlStatus({
     uuid: user_uuid,
     status: 'Refresh started',
   });
 
-  const userSettings = await blobRepository.getUserSettings(user_uuid);
+  const userSettings = await appleBlobRepository.getUserSettings(user_uuid);
   if (!userSettings.success) {
     logger.error('The album has not been set up yet.');
-    await blobRepository.setCrawlStatus({
+    await appleBlobRepository.setCrawlStatus({
       uuid: user_uuid,
       status: 'Refresh failed, album not set up',
     });
@@ -45,7 +45,7 @@ export const crawlAlbum = async ({
   }
 
   const getPartitionAndWebStreamResult =
-    await blobRepository.getPartitionAndWebStream(user_uuid);
+    await appleBlobRepository.getPartitionAndWebStream(user_uuid);
   let request_partition = 'p123';
   if (
     getPartitionAndWebStreamResult.success &&
@@ -61,12 +61,12 @@ export const crawlAlbum = async ({
     albumId
   );
 
-  await blobRepository.setWebStreamStatus({
+  await appleBlobRepository.setWebStreamStatus({
     uuid: user_uuid,
     web_stream_status: notFound ? 'not_found' : 'found',
   });
 
-  await blobRepository.setPartitionAndWebStream({
+  await appleBlobRepository.setPartitionAndWebStream({
     uuid: user_uuid,
     apple_partition: partition,
     web_stream_blob: webStream,
@@ -74,7 +74,7 @@ export const crawlAlbum = async ({
 
   if (webStream === undefined || webStream.photos.length === 0) {
     logger.error('No photos found in the shared album. :-/');
-    await blobRepository.setCrawlStatus({
+    await appleBlobRepository.setCrawlStatus({
       uuid: user_uuid,
       status: 'Refresh failed, no photos found',
     });
@@ -86,7 +86,7 @@ export const crawlAlbum = async ({
 
   logger.info(`Fetched ${webStream.photos.length} photos`);
 
-  await blobRepository.setCrawlStatus({
+  await appleBlobRepository.setCrawlStatus({
     uuid: user_uuid,
     status: 'Updated',
   });

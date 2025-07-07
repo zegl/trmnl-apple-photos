@@ -16,10 +16,3 @@ export const UserBlobSchema = z.object({
 });
 
 export type UserBlob = z.infer<typeof UserBlobSchema>;
-
-export const SettingsSchema = z.object({
-  uuid: z.string(),
-  sharedAlbumUrl: z.string(),
-});
-
-export type Settings = z.infer<typeof SettingsSchema>;

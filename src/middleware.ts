@@ -5,9 +5,10 @@ export function middleware(request: NextRequest) {
   const isRoute =
     !request.nextUrl.pathname.startsWith('/_next') &&
     !request.nextUrl.pathname.startsWith('/api') &&
-    !request.nextUrl.pathname.startsWith('/markup');
+    !request.nextUrl.pathname.startsWith('/markup') &&
+    !request.nextUrl.pathname.startsWith('/google/markup');
 
-  const devDefault: string = 'apple';
+  const devDefault: string = 'google';
 
   const isGooglePhotos =
     isRoute &&
@@ -19,6 +20,7 @@ export function middleware(request: NextRequest) {
       devDefault === 'apple');
 
   if (isGooglePhotos) {
+    console.log('rewriting to google', request.nextUrl.pathname);
     return NextResponse.rewrite(
       new URL(
         `/google${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -28,6 +30,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (isApplePhotos) {
+    console.log('rewriting to apple', request.nextUrl.pathname);
     return NextResponse.rewrite(
       new URL(
         `/apple${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -36,5 +39,6 @@ export function middleware(request: NextRequest) {
     );
   }
 
+  console.log('not rewriting', request.nextUrl.pathname);
   return NextResponse.next();
 }

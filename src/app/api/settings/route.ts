@@ -1,22 +1,22 @@
 import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
 import { NextResponse } from 'next/server';
-import { SettingsSchema } from '@/app/types';
-import { BlobRepository } from '@/blobs';
+import { AppleSettingsSchema } from '@/apple/types';
+import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
-    const parsedBody = SettingsSchema.parse(body);
+    const parsedBody = AppleSettingsSchema.parse(body);
 
     const supabaseClient = getSupabaseClientForUser(parsedBody.uuid);
-    const blobRepository = new BlobRepository(supabaseClient);
+    const appleBlobRepository = new AppleBlobRepository(supabaseClient);
 
-    await blobRepository.saveUserSettings(parsedBody.uuid, parsedBody);
+    await appleBlobRepository.saveUserSettings(parsedBody.uuid, parsedBody);
 
     const hatchet = Hatchet.init();
 
-    await blobRepository.setCrawlStatus({
+    await appleBlobRepository.setCrawlStatus({
       uuid: parsedBody.uuid,
       status: 'Refresh scheduled',
     });

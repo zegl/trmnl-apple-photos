@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { BlobRepository } from '@/blobs';
+import { BlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 
 export async function POST(request: Request): Promise<NextResponse> {

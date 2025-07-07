@@ -2,20 +2,16 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   type PublicAlbumWebStream,
   webStreamSchema,
-} from './app/apple-public-album';
-import {
-  type Settings,
-  SettingsSchema,
-  type UserBlob,
-  UserBlobSchema,
-} from './app/types';
-import type { Result } from './result';
+} from '../app/apple-public-album';
+import { type AppleSettings, AppleSettingsSchema } from '@/apple/types';
+import { type UserBlob, UserBlobSchema } from '@/app/types';
+import type { Result } from '../result';
 
 const applePhotosTableName = 'trmnl_apple_photos';
 
 type WebStreamStatus = 'not_found' | 'found' | 'error';
 
-export class BlobRepository {
+export class AppleBlobRepository {
   constructor(private readonly supabaseClient: SupabaseClient) {}
 
   getUserBlob = async (uuid: string): Promise<Result<UserBlob>> => {
@@ -54,7 +50,7 @@ export class BlobRepository {
       .upsert({ id: uuid, user }, { onConflict: 'id' });
   };
 
-  getUserSettings = async (uuid: string): Promise<Result<Settings>> => {
+  getUserSettings = async (uuid: string): Promise<Result<AppleSettings>> => {
     const { data, error } = await this.supabaseClient
       .from(applePhotosTableName)
       .select('settings')
@@ -69,7 +65,7 @@ export class BlobRepository {
       };
     }
 
-    const parsed = SettingsSchema.safeParse(data.settings);
+    const parsed = AppleSettingsSchema.safeParse(data.settings);
 
     if (!parsed.success) {
       console.error(
@@ -88,7 +84,7 @@ export class BlobRepository {
     };
   };
 
-  saveUserSettings = async (uuid: string, settings: Settings) => {
+  saveUserSettings = async (uuid: string, settings: AppleSettings) => {
     await this.supabaseClient
       .from(applePhotosTableName)
       .upsert(

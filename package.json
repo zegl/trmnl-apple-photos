@@ -22,6 +22,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@vercel/blob": "^1.0.1",
     "@vercel/edge-config": "^1.4.0",
+    "google-auth-library": "^10.1.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.3.2",
     "postcss": "^8.5.6",

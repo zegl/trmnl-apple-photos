@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { BlobRepository } from '@/blobs';
+import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
 import AlbumForm from './AlbumForm';
@@ -25,14 +25,14 @@ export default async function Page({
   }
 
   const supabaseClient = getSupabaseClientForUser(uuid);
-  const blobRepository = new BlobRepository(supabaseClient);
+  const appleBlobRepository = new AppleBlobRepository(supabaseClient);
 
-  const user = await blobRepository.getUserBlob(uuid);
+  const user = await appleBlobRepository.getUserBlob(uuid);
   if (!user.success) {
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  const settings = await blobRepository.getUserSettings(uuid);
+  const settings = await appleBlobRepository.getUserSettings(uuid);
 
   const initialSettings = settings.success ? settings.data : undefined;
 

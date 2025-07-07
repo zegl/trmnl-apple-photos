@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { BlobRepository } from '@/blobs';
+import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { getPhotos } from '../../photos';
 import Render from '@/app/Render';
@@ -39,10 +39,10 @@ export async function POST(request: Request) {
   params.append('user_uuid', user_uuid);
 
   const supabaseClient = getSupabaseClientForUser(user_uuid);
-  const blobRepository = new BlobRepository(supabaseClient);
+  const appleBlobRepository = new AppleBlobRepository(supabaseClient);
 
   const photos = await getPhotos({
-    blobRepository,
+    appleBlobRepository,
     user_uuid,
     crawl_if_missing: true,
   });
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   const show_message = photos.success ? undefined : photos.error;
   const url = photos.success ? photos.data.url : undefined;
 
-  await blobRepository.increaseRenderCount(user_uuid);
+  await appleBlobRepository.increaseRenderCount(user_uuid);
 
   const { renderToString } = await import('react-dom/server');
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
             />
           </head>
           <body className="environment trmnl">
-              <Render url={url} size={size.size} show_message={show_message} />
+            <Render url={url} size={size.size} show_message={show_message} />
           </body>
         </html>
       );

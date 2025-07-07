@@ -5,8 +5,8 @@ import {
   RateLimitDuration,
   type TaskFn,
 } from '@hatchet-dev/typescript-sdk';
-import { BlobRepository } from '../src/blobs';
-import { crawlAlbum } from '../src/crawl';
+import { BlobRepository } from '../src/apple/blobs';
+import { crawlAlbum } from '../src/apple/crawl';
 import { getGenericSupabaseClient } from '../src/supabase';
 
 export const hatchet = Hatchet.init();

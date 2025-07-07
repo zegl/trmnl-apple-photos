@@ -1,4 +1,4 @@
-import { BlobRepository } from '@/blobs';
+import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
 import { getPhotos } from '@/app/photos';
@@ -35,15 +35,15 @@ export default async function Page({
   }
 
   const supabaseClient = getSupabaseClientForUser(user_uuid);
-  const blobRepository = new BlobRepository(supabaseClient);
+  const appleBlobRepository = new AppleBlobRepository(supabaseClient);
 
-  const user = await blobRepository.getUserBlob(user_uuid);
+  const user = await appleBlobRepository.getUserBlob(user_uuid);
   if (!user.success) {
     return <FullScreenMessage message="User not found :-(" />;
   }
 
   const photos = await getPhotos({
-    blobRepository,
+    appleBlobRepository,
     user_uuid,
     crawl_if_missing: true,
   });
@@ -51,7 +51,7 @@ export default async function Page({
     return <FullScreenMessage message={photos.error} />;
   }
 
-  const crawlStatus = await blobRepository.getCrawlStatus(user_uuid);
+  const crawlStatus = await appleBlobRepository.getCrawlStatus(user_uuid);
 
   const lastUpdatedAt = crawlStatus.success
     ? crawlStatus.data.web_stream_blob_fetched_at
