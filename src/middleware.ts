@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/api');
 
   const devDefault: string = 'apple';
-  
+
   const isGooglePhotos =
     isRoute &&
     (request.nextUrl.hostname === 'trmnl-google-photos.westling.dev' ||
@@ -18,11 +18,21 @@ export function middleware(request: NextRequest) {
       devDefault === 'apple');
 
   if (isGooglePhotos) {
-    return NextResponse.rewrite(new URL('/google', request.url));
+    return NextResponse.rewrite(
+      new URL(
+        `/google${request.nextUrl.pathname}${request.nextUrl.search}`,
+        request.url
+      )
+    );
   }
 
   if (isApplePhotos) {
-    return NextResponse.rewrite(new URL('/apple', request.url));
+    return NextResponse.rewrite(
+      new URL(
+        `/apple${request.nextUrl.pathname}${request.nextUrl.search}`,
+        request.url
+      )
+    );
   }
 
   return NextResponse.next();
