@@ -10,6 +10,12 @@ export function middleware(request: NextRequest) {
 
   const devDefault: string = 'google';
 
+  console.log('middleware', {
+    isRoute,
+    hostname: request.nextUrl.hostname,
+    host: request.nextUrl.host,
+  });
+
   const isGooglePhotos =
     isRoute &&
     (request.nextUrl.hostname === 'trmnl-google-photos.westling.dev' ||
