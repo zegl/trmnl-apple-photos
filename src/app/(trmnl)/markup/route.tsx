@@ -66,7 +66,9 @@ export async function POST(request: Request) {
             />
           </head>
           <body>
-            <Render url={url} size={size.size} show_message={show_message} />
+            <div className="environment trmnl">
+              <Render url={url} size={size.size} show_message={show_message} />
+            </div>
           </body>
         </html>
       );

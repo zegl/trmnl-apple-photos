@@ -84,22 +84,38 @@ export default async function Page({
       <h2 className="text-lg text-gray-500">full</h2>
 
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
-        <Render url={url} size="full" />
+        <div className="environment trmnl">
+          <div className="screen">
+            <Render url={url} size="full" />
+          </div>
+        </div>
       </div>
 
       <h2 className="text-lg text-gray-500">half_vertical</h2>
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
-        <Render url={url} size="half_vertical" />
+        <div className="environment trmnl">
+          <div className="screen">
+            <Render url={url} size="half_vertical" />
+          </div>
+        </div>
       </div>
 
       <h2 className="text-lg text-gray-500">half_horizontal</h2>
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
-        <Render url={url} size="half_horizontal" />
+        <div className="environment trmnl">
+          <div className="screen">
+            <Render url={url} size="half_horizontal" />
+          </div>
+        </div>
       </div>
 
       <h2 className="text-lg text-gray-500">quadrant</h2>
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
-        <Render url={url} size="quadrant" />
+        <div className="environment trmnl">
+          <div className="screen">
+            <Render url={url} size="quadrant" />
+          </div>
+        </div>
       </div>
     </div>
   );
