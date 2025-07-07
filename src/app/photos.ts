@@ -7,7 +7,7 @@ import {
   getPublicAlbumId,
   type PublicAlbumWebStream,
 } from './apple-public-album';
-import type { Settings } from './types';
+import type { AppleSettings } from '@/apple/types';
 
 type ImageResult = Result<{
   url: string;
@@ -20,7 +20,7 @@ const _tryCrawlNewImage = async ({
 }: {
   appleBlobRepository: AppleBlobRepository;
   user_uuid: string;
-  settings: Settings;
+  settings: AppleSettings;
 }): Promise<ImageResult> => {
   const getPartitionAndWebStreamResult =
     await appleBlobRepository.getPartitionAndWebStream(user_uuid);

@@ -5,7 +5,7 @@ import {
   RateLimitDuration,
   type TaskFn,
 } from '@hatchet-dev/typescript-sdk';
-import { BlobRepository } from '../src/apple/blobs';
+import { AppleBlobRepository } from '../src/apple/blobs';
 import { crawlAlbum } from '../src/apple/crawl';
 import { getGenericSupabaseClient } from '../src/supabase';
 
@@ -127,8 +127,8 @@ onCron.task({
   name: 'trigger-all',
   fn: async (_, ctx) => {
     const supabase = getGenericSupabaseClient();
-    const blobRepository = new BlobRepository(supabase);
-    const users = await blobRepository.listAlbumsToRefresh();
+    const appleBlobRepository = new AppleBlobRepository(supabase);
+    const users = await appleBlobRepository.listAlbumsToRefresh();
 
     if (!users.success) {
       throw new Error('Error listing all users', { cause: users.error });

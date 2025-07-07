@@ -2,7 +2,6 @@ import { getClient } from '@/google/auth';
 import { GoogleBlobRepository } from '@/google/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
 export async function GET(request: Request): Promise<NextResponse> {
   const url = new URL(request.url);
@@ -23,46 +22,28 @@ export async function GET(request: Request): Promise<NextResponse> {
   const client = getClient();
   const { tokens } = await client.getToken(code);
 
-  const googleTokens = await googleBlobRepository.getGoogleTokens(state);
-
-  if (
-    !googleTokens.success ||
-    !googleTokens.data.google_access_token ||
-    !googleTokens.data.google_refresh_token
-  ) {
+  if (!tokens.access_token || !tokens.expiry_date || !tokens.scope) {
     return NextResponse.json(
-      { error: 'Failed to get Google tokens' },
-      { status: 500 }
+      { error: 'Missing access token, expires at, or scope' },
+      { status: 400 }
     );
   }
 
-  const client = getClient();
-
-  client.setCredentials({
-    access_token: googleTokens.data.google_access_token,
-    refresh_token: googleTokens.data.google_refresh_token,
+  await googleBlobRepository.setGoogleTokens({
+    user_uuid: state,
+    google_access_token: tokens.access_token,
+    google_access_token_expires_at: new Date(tokens.expiry_date),
+    google_scope: tokens.scope,
   });
 
-  const create = await client.request({
-    url: 'https://photospicker.googleapis.com/v1/sessions',
-    method: 'POST',
-    body: JSON.stringify({
-      album: {
-        title: 'TRMNL',
-      },
-    }),
-  });
+  // If has refresh token, set it
+  if (tokens.refresh_token) {
+    await googleBlobRepository.setGoogleRefreshToken({
+      user_uuid: state,
+      google_refresh_token: tokens.refresh_token,
+    });
+  }
 
-  console.log('created google pick session', create.data);
-
-  const createResponse = GooglePickingSessionResponseSchema.parse(create.data);
-
-  await googleBlobRepository.setGooglePickSessionId({
-    user_uuid: user_uuid,
-    google_pick_session_id: createResponse.id,
-  });
-
-  return NextResponse.json({
-    status: 'success',
-  });
+  // redirect to the home page
+  return NextResponse.redirect(new URL(`/settings?uuid=${state}`, request.url));
 }

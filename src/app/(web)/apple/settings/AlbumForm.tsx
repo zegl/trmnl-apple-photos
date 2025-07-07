@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { Settings, UserBlob } from '@/app/types';
+import type { UserBlob } from '@/app/types';
 import LinkButton from '@/app/LinkButton';
+import { AppleSettings } from '@/apple/types';
 
 interface AlbumFormProps {
   uuid: string;
-  initialSettings?: Settings;
+  initialSettings?: AppleSettings;
   user: UserBlob;
 }
 
@@ -59,7 +60,7 @@ export default function AlbumForm({
     setMessage(null);
     setDidSaveNewAlbum(false);
 
-    const settings: Settings = {
+    const settings: AppleSettings = {
       uuid,
       sharedAlbumUrl: data.sharedAlbumUrl,
     };

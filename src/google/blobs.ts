@@ -77,7 +77,7 @@ export class GoogleBlobRepository {
     }
   };
 
-  saveGoogleTokens = async ({
+  setGoogleTokens = async ({
     user_uuid,
     google_access_token,
     google_access_token_expires_at,
@@ -98,7 +98,7 @@ export class GoogleBlobRepository {
       .eq('id', user_uuid);
   };
 
-  saveGoogleRefreshToken = async ({
+  setGoogleRefreshToken = async ({
     user_uuid,
     google_refresh_token,
   }: {
