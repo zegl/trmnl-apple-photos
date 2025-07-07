@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
-import FullScreenMessage from '../../FullScreenMessage';
+import FullScreenMessage from '@/app/FullScreenMessage';
 import AlbumForm from './AlbumForm';
 
 import type { Metadata } from 'next';

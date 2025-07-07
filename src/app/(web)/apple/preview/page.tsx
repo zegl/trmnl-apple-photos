@@ -1,10 +1,10 @@
 import { BlobRepository } from '@/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
-import FullScreenMessage from '../../FullScreenMessage';
-import { getPhotos } from '../../photos';
-import Render from '../../Render';
+import FullScreenMessage from '@/app/FullScreenMessage';
+import { getPhotos } from '@/app/photos';
+import Render from '@/app/Render';
+import LinkButton from '@/app/LinkButton';
 import './trmnl-mini.css';
-import LinkButton from '../LinkButton';
 
 import type { Metadata } from 'next';
 

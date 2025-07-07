@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { Settings, UserBlob } from '../../types';
-import LinkButton from '../LinkButton';
+import type { Settings, UserBlob } from '@/app/types';
+import LinkButton from '@/app/LinkButton';
 
 interface AlbumFormProps {
   uuid: string;
