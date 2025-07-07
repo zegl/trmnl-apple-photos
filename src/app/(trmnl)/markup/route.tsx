@@ -65,10 +65,8 @@ export async function POST(request: Request) {
               href="https://usetrmnl.com/css/latest/plugins.css"
             />
           </head>
-          <body>
-            <div className="environment trmnl">
+          <body className="environment trmnl">
               <Render url={url} size={size.size} show_message={show_message} />
-            </div>
           </body>
         </html>
       );
