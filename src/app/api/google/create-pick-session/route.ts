@@ -2,19 +2,23 @@ import { getClient } from '@/google/auth';
 import { GoogleBlobRepository } from '@/google/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import {
+  CreatePickSessionResponse,
+  GooglePickingSessionResponse,
+  GooglePickingSessionResponseSchema,
+} from './type';
 
-const GooglePickingSessionResponseSchema = z.object({
-  id: z.string(),
-  pickerUri: z.string(),
-});
-
-export async function POST(request: Request): Promise<NextResponse> {
+export async function POST(
+  request: Request
+): Promise<NextResponse<CreatePickSessionResponse>> {
   const body = await request.json();
   const { user_uuid } = body;
 
   if (!user_uuid) {
-    return NextResponse.json({ error: 'Missing user_uuid' }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: 'Missing user_uuid' },
+      { status: 400 }
+    );
   }
 
   const supabaseClient = getSupabaseClientForUser(user_uuid);
@@ -28,7 +32,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     !googleTokens.data.google_refresh_token
   ) {
     return NextResponse.json(
-      { error: 'Failed to get Google tokens' },
+      { success: false, error: 'Failed to get Google tokens' },
       { status: 500 }
     );
   }
@@ -43,23 +47,26 @@ export async function POST(request: Request): Promise<NextResponse> {
   const create = await client.request({
     url: 'https://photospicker.googleapis.com/v1/sessions',
     method: 'POST',
-    body: JSON.stringify({
-      album: {
-        title: 'TRMNL',
-      },
-    }),
+    // body: JSON.stringify({
+    //   album: {
+    //     title: 'TRMNL',
+    //   },
+    // }),
   });
 
   console.log('created google pick session', create.data);
 
   const createResponse = GooglePickingSessionResponseSchema.parse(create.data);
 
-  await googleBlobRepository.setGooglePickSessionId({
+  await googleBlobRepository.setGooglePickSession({
     user_uuid: user_uuid,
     google_pick_session_id: createResponse.id,
+    google_pick_session_done: false,
   });
 
   return NextResponse.json({
-    status: 'success',
+    success: true,
+    id: createResponse.id,
+    pickerUri: createResponse.pickerUri,
   });
 }

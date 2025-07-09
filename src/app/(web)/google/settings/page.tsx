@@ -1,11 +1,10 @@
 import { GoogleBlobRepository } from '@/google/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
-import { getAuthURL } from '@/google/auth';
 
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import Client, { AppState } from './Client';
+import Client from './Client';
 
 export const metadata: Metadata = {
   title: 'Google Photos for TRMNL',
@@ -33,40 +32,7 @@ export default async function Page({
     return <FullScreenMessage message="User not found :-(" />;
   }
 
-  const googleTokens = await googleBlobRepository.getGoogleTokens(uuid);
-
-  let appState: AppState;
-
-  if (googleTokens.success) {
-    appState = {
-      state: 'connected-no-pictures',
-      user_uuid: uuid,
-    };
-
-    const googlePickSessionId =
-      await googleBlobRepository.getGooglePickSessionId(uuid);
-    if (
-      googlePickSessionId.success &&
-      googlePickSessionId.data.google_pick_session_id
-    ) {
-      appState = {
-        state: 'connected-pictures',
-        user_uuid: uuid,
-      };
-    }
-  } else {
-    appState = {
-      state: 'not-connected',
-      signInUrl: getAuthURL({ user_uuid: uuid }),
-      user_uuid: uuid,
-    };
-  }
-
-  appState = {
-    state: 'not-connected',
-    signInUrl: getAuthURL({ user_uuid: uuid }),
-    user_uuid: uuid,
-  };
+  const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.data.user.plugin_setting_id}/edit?force_refresh=true`;
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -76,7 +42,7 @@ export default async function Page({
       </p>
 
       <Suspense fallback={<div>Loading...</div>}>
-        <Client appState={appState} />
+        <Client user_uuid={uuid} backToTrmnlUrl={backToTrmnlUrl} />
       </Suspense>
     </div>
   );

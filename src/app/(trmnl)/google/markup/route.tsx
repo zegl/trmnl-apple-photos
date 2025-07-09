@@ -3,6 +3,8 @@ import { getSupabaseClientForUser } from '@/supabase';
 import Render from '@/app/Render';
 import { GoogleBlobRepository } from '@/google/blobs';
 import { getClient } from '@/google/auth';
+import { listImagesInAlbum } from '@/google/album';
+import { put } from '@vercel/blob';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -44,21 +46,16 @@ export async function POST(request: Request) {
   let show_message: string | undefined;
   let image_url: string | undefined;
 
-  const googleAlbum = await googleBlobRepository.getGoogleAlbum(user_uuid);
   const googleTokens = await googleBlobRepository.getGoogleTokens(user_uuid);
+  const googlePickSession =
+    await googleBlobRepository.getGooglePickSession(user_uuid);
 
   if (
-    !googleAlbum.success ||
-    !googleAlbum.data.google_album_id ||
-    !googleAlbum.data.google_album_url
-  ) {
-    show_message = 'Google album not found';
-  } else if (
     !googleTokens.success ||
-    !googleTokens.data.google_access_token ||
-    !googleTokens.data.google_refresh_token
+    !googlePickSession.success ||
+    !googlePickSession.data.google_pick_session_id
   ) {
-    show_message = 'Google tokens not found';
+    show_message = 'This album is not connected to Google Photos';
   } else {
     const client = getClient();
     client.setCredentials({
@@ -66,25 +63,47 @@ export async function POST(request: Request) {
       refresh_token: googleTokens.data.google_refresh_token,
     });
 
-    const request = {
-      url: 'https://photoslibrary.googleapis.com/v1/mediaItems:search',
-      method: 'POST',
-      body: JSON.stringify({
-        albumId: googleAlbum.data.google_album_id,
-      }),
-    };
+    const mediaItems = await listImagesInAlbum({
+      client,
+      google_pick_session_id: googlePickSession.data.google_pick_session_id,
+    });
 
-    const response = await client.request(request);
+    if (!mediaItems.success) {
+      show_message = 'Failed to get media items';
+    } else {
+      const photos = mediaItems.data.filter((item) => item.type === 'PHOTO');
+      if (photos.length === 0) {
+        show_message = 'No photos found in this album';
+      } else {
+        const randomIndex = Math.floor(Math.random() * photos.length);
+        const randomImage = photos[randomIndex];
 
-    console.log('req', request);
+        // Download the image from Google Photos
 
-    console.log('response', response.data);
+        const photoBytes = await client.request({
+          url: randomImage.mediaFile.baseUrl + '=w1024-h1024',
+          method: 'GET',
+        });
 
-    show_message = 'TODO';
+        console.log('photoBytes', photoBytes);
+
+        // Upload to Vercel Blobs
+        // generate a random name
+        // const randomName = Math.random().toString(36).substring(2, 15);
+        const { url } = await put(
+          user_uuid + '.jpg',
+          photoBytes.data as string,
+          {
+            access: 'public',
+            addRandomSuffix: true,
+            token: process.env.BLOB_GOOGLE_READ_WRITE_TOKEN,
+          }
+        );
+
+        image_url = url;
+      }
+    }
   }
-
-  // const show_message = photos.success ? undefined : photos.error;
-  // const url = photos.success ? photos.data.url : undefined;
 
   await googleBlobRepository.increaseRenderCount(user_uuid);
 

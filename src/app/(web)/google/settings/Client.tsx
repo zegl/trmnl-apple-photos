@@ -1,59 +1,163 @@
 'use client';
 
-import Button from '@/app/Button';
-import LinkButton from '@/app/LinkButton';
-import { useState } from 'react';
+import { CreatePickSessionResponseSchema } from '@/app/api/google/create-pick-session/type';
+import { AppState } from '@/app/api/google/get-app-state/type';
+import { PrimaryButton } from '@/app/Button';
+import { useEffect, useState } from 'react';
 
-export type AppState =
-  | {
-      state: 'not-connected';
-      signInUrl: string;
-      user_uuid: string;
-    }
-  | {
-      state: 'connected-no-pictures';
-      user_uuid: string;
-    }
-  | {
-      state: 'connected-pictures';
-      user_uuid: string;
-      //   album: {
-      //     id: string;
-      //     url: string;
-      //   }
-    };
-
-export default function Client({ appState }: { appState: AppState }) {
+export default function Client({
+  user_uuid,
+  backToTrmnlUrl,
+}: {
+  user_uuid: string;
+  backToTrmnlUrl: string;
+}) {
   const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
-  const createAlbum = async () => {
-    setIsCreatingAlbum(true);
-    const response = await fetch(`/api/google/create-pick-session`, {
-      method: 'POST',
-      body: JSON.stringify({
-        user_uuid: appState.user_uuid,
-      }),
-    });
+  const [appStateLoading, setAppStateLoading] = useState(false);
+  const [createAlbumError, setCreateAlbumError] = useState<string | null>(null);
+  const [appState, setAppState] = useState<AppState | null>(null);
 
-    if (response.ok) {
-      // Reload page
-      window.location.reload();
+  const fetchAppState = async () => {
+    setAppStateLoading(true);
+
+    try {
+      const response = await fetch(`/api/google/get-app-state`, {
+        method: 'POST',
+        body: JSON.stringify({ user_uuid }),
+      });
+
+      if (response.ok) {
+        const data = AppState.safeParse(await response.json());
+        if (data.success) {
+          setAppState(data.data);
+        } else {
+          setAppState(null);
+        }
+      } else {
+        setAppState(null);
+      }
+    } catch (error) {
+      setAppState(null);
+    } finally {
+      setAppStateLoading(false);
     }
   };
 
+  const createAlbum = async () => {
+    setIsCreatingAlbum(true);
+    setCreateAlbumError(null);
+    setAppState(null);
+    const response = await fetch(`/api/google/create-pick-session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_uuid,
+      }),
+    });
+
+    const data = CreatePickSessionResponseSchema.safeParse(
+      await response.json()
+    );
+    if (!data.success) {
+      setCreateAlbumError('Failed to create album');
+      return;
+    }
+
+    if (!data.data.success) {
+      setCreateAlbumError(data.data.error);
+      return;
+    }
+
+    window.open(data.data.pickerUri, '_blank');
+
+    setTimeout(() => {
+      fetchAppState();
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const shouldPoll =
+      (appState?.state === 'connected-pictures' && appState.imageCount === 0) ||
+      appState?.state === 'connected-picking';
+    if (!shouldPoll) {
+      return;
+    }
+    console.log('scheduling poll');
+
+    const interval = setInterval(() => {
+      console.log('polling');
+      fetchAppState();
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [appState]);
+
+  useEffect(() => {
+    fetchAppState();
+  }, []);
+
+  const canCreateNewAlbum =
+    appState &&
+    (appState.state === 'connected-no-pictures' ||
+      appState.state === 'connected-pictures');
+
+  if (!appState) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
+      {appStateLoading && <p>Loading...</p>}
+
       {appState.state === 'not-connected' && (
-        <LinkButton href={appState.signInUrl}>Select Pictures</LinkButton>
+        <PrimaryButton href={appState.signInUrl}>
+          Sign in with Google
+        </PrimaryButton>
       )}
 
       {appState.state === 'connected-no-pictures' && (
-        <Button onClick={createAlbum} disabled={isCreatingAlbum}>
-          {isCreatingAlbum ? '...' : 'Select Pictures'}
-        </Button>
+        <>
+          <p>Select pictures from your Google Photos album, opens a new tab.</p>
+          <PrimaryButton onClick={createAlbum} disabled={isCreatingAlbum}>
+            {isCreatingAlbum ? 'Loading...' : 'Select Pictures'}
+          </PrimaryButton>
+        </>
       )}
 
+      {appState.state === 'connected-picking' && (
+        <>
+          <p>
+            Please select photos in Google Photos, and come back here when
+            you're done.
+          </p>
+          <PrimaryButton
+            onClick={() => window.open(appState.pickerUri, '_blank')}
+          >
+            Open Google Photos
+          </PrimaryButton>
+        </>
+      )}
+
+      {createAlbumError && <p className="text-red-500">{createAlbumError}</p>}
+
       {appState.state === 'connected-pictures' && (
-        <p>You are connected to Google and have selected pictures</p>
+        <>
+          {appState.imageCount > 0 && (
+            <>
+              <p>Your album with {appState.imageCount} pictures is ready.</p>
+              <PrimaryButton href={backToTrmnlUrl}>
+                ↩️ Back to TRMNL
+              </PrimaryButton>
+            </>
+          )}
+          {appState.imageCount === 0 && <p>Processing photos...</p>}
+        </>
+      )}
+
+      {canCreateNewAlbum && (
+        <div className="mt-4">
+          <PrimaryButton color="gray" onClick={createAlbum}>
+            Create new album
+          </PrimaryButton>
+        </div>
       )}
     </div>
   );

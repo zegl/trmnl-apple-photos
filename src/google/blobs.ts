@@ -185,25 +185,32 @@ export class GoogleBlobRepository {
     };
   };
 
-  setGooglePickSessionId = async ({
+  setGooglePickSession = async ({
     user_uuid,
     google_pick_session_id,
+    google_pick_session_done,
   }: {
     user_uuid: string;
     google_pick_session_id: string;
+    google_pick_session_done: boolean;
   }) => {
     await this.supabaseClient
       .from(googlePhotosTableName)
-      .update({ google_pick_session_id })
+      .update({ google_pick_session_id, google_pick_session_done })
       .eq('id', user_uuid);
   };
 
-  getGooglePickSessionId = async (
+  getGooglePickSession = async (
     user_uuid: string
-  ): Promise<Result<{ google_pick_session_id: string | null }>> => {
+  ): Promise<
+    Result<{
+      google_pick_session_id: string | null;
+      google_pick_session_done: boolean;
+    }>
+  > => {
     const { data, error } = await this.supabaseClient
       .from(googlePhotosTableName)
-      .select('google_pick_session_id')
+      .select('google_pick_session_id, google_pick_session_done')
       .eq('id', user_uuid)
       .single();
 
@@ -219,6 +226,7 @@ export class GoogleBlobRepository {
       success: true,
       data: {
         google_pick_session_id: data.google_pick_session_id ?? null,
+        google_pick_session_done: data.google_pick_session_done ?? false,
       },
     };
   };
