@@ -15,21 +15,16 @@ export function getClient(): OAuth2Client {
   return new OAuth2Client(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
-    'http://localhost:3003/api/google/oauth/google/callback'
+    process.env.VERCEL === '1'
+      ? 'https://trmnl-google-photos.vercel.app/api/google/oauth/google/callback'
+      : 'http://localhost:3003/api/google/oauth/google/callback'
   );
 }
 
 export function getAuthURL({ user_uuid }: { user_uuid: string }) {
   const authorizeUrl = getClient().generateAuthUrl({
     access_type: 'offline',
-    scope: [
-      // 'https://www.googleapis.com/auth/userinfo.profile',
-      // 'https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata',
-      // 'https://www.googleapis.com/auth/photoslibrary.appendonly',
-      // 'https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata',
-      // 'https://www.googleapis.com/auth/photoslibrary.appendonly',
-      'https://www.googleapis.com/auth/photospicker.mediaitems.readonly',
-    ],
+    scope: ['https://www.googleapis.com/auth/photospicker.mediaitems.readonly'],
     state: user_uuid,
     prompt: 'consent', // this is required to get a refresh token
   });

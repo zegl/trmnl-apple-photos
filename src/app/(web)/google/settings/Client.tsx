@@ -3,14 +3,17 @@
 import { CreatePickSessionResponseSchema } from '@/app/api/google/create-pick-session/type';
 import { AppState } from '@/app/api/google/get-app-state/type';
 import { PrimaryButton } from '@/app/Button';
+import { UserBlob } from '@/app/types';
 import { useEffect, useState } from 'react';
 
 export default function Client({
   user_uuid,
   backToTrmnlUrl,
+  user,
 }: {
   user_uuid: string;
   backToTrmnlUrl: string;
+  user: UserBlob;
 }) {
   const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
   const [appStateLoading, setAppStateLoading] = useState(false);
@@ -104,13 +107,20 @@ export default function Client({
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {appStateLoading && <p>Loading...</p>}
 
       {appState.state === 'not-connected' && (
-        <PrimaryButton href={appState.signInUrl}>
-          Sign in with Google
-        </PrimaryButton>
+        <>
+          <p>
+            Hello <strong className="text-gray-900">{user.user.name}</strong>,
+            let's get you set up!
+          </p>
+
+          <PrimaryButton href={appState.signInUrl}>
+            Sign in with Google
+          </PrimaryButton>
+        </>
       )}
 
       {appState.state === 'connected-no-pictures' && (
@@ -142,10 +152,16 @@ export default function Client({
         <>
           {appState.imageCount > 0 && (
             <>
-              <p>Your album with {appState.imageCount} pictures is ready.</p>
-              <PrimaryButton href={backToTrmnlUrl}>
-                ↩️ Back to TRMNL
-              </PrimaryButton>
+              <p>
+                Your album with {appState.imageCount} pictures is ready. A
+                photos will be displayed on your TRMNL device the next time the
+                plugin is refreshed.
+              </p>
+              <div>
+                <PrimaryButton href={backToTrmnlUrl}>
+                  ↩️ Back to TRMNL
+                </PrimaryButton>
+              </div>
             </>
           )}
           {appState.imageCount === 0 && <p>Processing photos...</p>}
@@ -153,9 +169,9 @@ export default function Client({
       )}
 
       {canCreateNewAlbum && (
-        <div className="mt-4">
+        <div>
           <PrimaryButton color="gray" onClick={createAlbum}>
-            Create new album
+            Select new photos
           </PrimaryButton>
         </div>
       )}

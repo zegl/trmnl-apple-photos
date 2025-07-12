@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-// import exampleImage from './example.png';
+import exampleImage from './example.png';
 
 export const metadata: Metadata = {
   title: 'Google Photos for TRMNL',
@@ -15,12 +15,12 @@ export default function Home() {
         Google Photos album.
       </p>
 
-      {/* <img
+      <img
         src={exampleImage.src}
         height={exampleImage.height}
         width={exampleImage.width}
-        alt="Picture of a bird, as shown using the Apple Photos plugin on a TRMNL device"
-      /> */}
+        alt="Picture of a bird, as shown using the Google Photos plugin on a TRMNL device"
+      />
 
       <p>
         Install the plugin from{' '}

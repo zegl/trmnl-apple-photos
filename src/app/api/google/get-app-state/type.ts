@@ -19,10 +19,6 @@ export const AppState = z.discriminatedUnion('state', [
   z.object({
     state: z.literal('connected-pictures'),
     imageCount: z.number(),
-    //   album: {
-    //     id: string;
-    //     url: string;
-    //   }
   }),
 ]);
 

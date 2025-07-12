@@ -36,13 +36,12 @@ export default async function Page({
 
   return (
     <div className="flex flex-col gap-4 w-full">
-      <p>
-        Hello <strong className="text-gray-900">{user.data.user.name}</strong>,
-        let's get you set up!
-      </p>
-
       <Suspense fallback={<div>Loading...</div>}>
-        <Client user_uuid={uuid} backToTrmnlUrl={backToTrmnlUrl} />
+        <Client
+          user_uuid={uuid}
+          backToTrmnlUrl={backToTrmnlUrl}
+          user={user.data}
+        />
       </Suspense>
     </div>
   );

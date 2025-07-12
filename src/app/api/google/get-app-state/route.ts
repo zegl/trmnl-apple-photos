@@ -96,8 +96,6 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
     getPickSession.data
   );
 
-  console.log('getPickSessionResponse', getPickSessionResponse);
-
   if (!getPickSessionResponse.success) {
     console.error(
       'Failed to parse get pick session response',

@@ -4,7 +4,6 @@ import { getSupabaseClientForUser } from '@/supabase';
 import { NextResponse } from 'next/server';
 import {
   CreatePickSessionResponse,
-  GooglePickingSessionResponse,
   GooglePickingSessionResponseSchema,
 } from './type';
 
@@ -47,14 +46,7 @@ export async function POST(
   const create = await client.request({
     url: 'https://photospicker.googleapis.com/v1/sessions',
     method: 'POST',
-    // body: JSON.stringify({
-    //   album: {
-    //     title: 'TRMNL',
-    //   },
-    // }),
   });
-
-  console.log('created google pick session', create.data);
 
   const createResponse = GooglePickingSessionResponseSchema.parse(create.data);
 
