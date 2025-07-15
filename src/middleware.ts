@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/markup') &&
     !request.nextUrl.pathname.startsWith('/google/markup');
 
-  const devDefault: string = 'google';
+  const devDefault: string = 'apple';
 
   console.log('middleware', {
     isRoute,
