@@ -68,7 +68,7 @@ export default function AlbumForm({
     };
 
     try {
-      const response = await fetch('/api/settings', {
+      const response = await fetch('/api/apple/save-album', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
