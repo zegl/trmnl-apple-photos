@@ -10,9 +10,10 @@ export function middleware(request: NextRequest) {
 
   const devDefault: string = 'apple';
 
-
-  const isGoogleHost = request.nextUrl.hostname === 'trmnl-google-photos.westling.dev';
-  const isAppleHost = request.nextUrl.hostname === 'trmnl-apple-photos.westling.dev';
+  const isGoogleHost =
+    request.nextUrl.hostname === 'trmnl-google-photos.westling.dev';
+  const isAppleHost =
+    request.nextUrl.hostname === 'trmnl-apple-photos.westling.dev';
   const isAnyHost = isGoogleHost || isAppleHost;
 
   const fallbackToGoogle = !isAnyHost && devDefault === 'google';
@@ -20,7 +21,6 @@ export function middleware(request: NextRequest) {
 
   const isGooglePhotosRoute = isRoute && (isGoogleHost || fallbackToGoogle);
   const isApplePhotosRoute = isRoute && (isAppleHost || fallbackToApple);
-
 
   console.log('middleware', {
     isRoute,

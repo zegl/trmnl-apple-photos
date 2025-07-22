@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import type { UserBlob } from '@/app/types';
 import LinkButton from '@/app/LinkButton';
 import { AppleSettings } from '@/apple/types';
+import { PrimaryButton } from '@/app/Button';
+import { AppleRediscoverImagesRequest } from '@/app/api/apple/rediscover-images/type';
 
 interface AlbumFormProps {
   uuid: string;
@@ -92,6 +94,46 @@ export default function AlbumForm({
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const [isRediscoveringImages, setIsRediscoveringImages] = useState(false);
+  const [didRediscoverImages, setDidRediscoverImages] = useState(false);
+
+  const onRediscoverImagesClick = async () => {
+    setIsRediscoveringImages(true);
+    setDidRediscoverImages(false);
+
+    const request: AppleRediscoverImagesRequest = {
+      user_uuid: uuid,
+    };
+
+    try {
+      const response = await fetch('/api/apple/rediscover-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setDidRediscoverImages(true);
+      } else {
+        setMessage({
+          text: `Error: ${result.error || 'Failed to re-discover images'}`,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      setMessage({
+        text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        type: 'error',
+      });
+    } finally {
+      setIsRediscoveringImages(false);
     }
   };
 
@@ -183,22 +225,34 @@ export default function AlbumForm({
           </>
         )}
 
+        {didRediscoverImages && (
+          <div className="text-green-500 text-sm mt-2">
+            The album contents will now be re-discovered in the background, it
+            might take a minute or two to process it.
+          </div>
+        )}
+
         <div className="flex flex-row gap-4">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="cursor-pointer rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-          >
+          <PrimaryButton type="submit" disabled={isSubmitting} color="blue">
             {isSubmitting ? 'Saving...' : 'Save Album'}
-          </button>
+          </PrimaryButton>
 
           {hasAlbumUrl && (
-            <a
-              href={`/preview?user_uuid=${uuid}`}
-              className="cursor-pointer rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-            >
+            <PrimaryButton href={`/preview?user_uuid=${uuid}`} color="gray">
               👀 Preview Album
-            </a>
+            </PrimaryButton>
+          )}
+
+          {hasAlbumUrl && (
+            <PrimaryButton
+              onClick={onRediscoverImagesClick}
+              disabled={isRediscoveringImages}
+              color="gray"
+            >
+              {isRediscoveringImages
+                ? 'Re-discovering...'
+                : '🔃 Re-discover images'}
+            </PrimaryButton>
           )}
         </div>
       </form>

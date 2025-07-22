@@ -25,16 +25,18 @@ export function PrimaryButton({
   href,
   disabled,
   color = 'blue',
+  type = 'button',
 }: {
   onClick?: () => void;
   href?: string;
   children: React.ReactNode;
   disabled?: boolean;
   color?: 'blue' | 'gray';
+  type?: 'button' | 'submit';
 }) {
   const colors = {
     blue: 'bg-blue-600 hover:bg-blue-500 focus-visible:outline-blue-600',
-    gray: 'bg-gray-400 hover:bg-gray-300 focus-visible:outline-gray-400',
+    gray: 'bg-gray-400 hover:bg-gray-500 focus-visible:outline-gray-400',
   };
 
   const className = `cursor-pointer rounded-md ${colors[color]} px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs  focus-visible:outline-2 focus-visible:outline-offset-2 ${disabled ? 'opacity-50' : 'cursor-pointer'}`;
@@ -49,7 +51,7 @@ export function PrimaryButton({
 
   return (
     <button
-      type="button"
+      type={type}
       className={className}
       onClick={onClick}
       disabled={disabled}
