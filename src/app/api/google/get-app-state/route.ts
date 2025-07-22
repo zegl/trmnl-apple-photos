@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { AppState } from './type';
 import { listImagesInAlbum } from '@/google/album';
+import { Credentials } from 'google-auth-library';
+import { onGoogleClientTokens } from '@/google/auth-refresher';
 
 const GooglePickingSessionResponseSchema = z.object({
   id: z.string(),
@@ -39,8 +41,8 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
     !googleTokens.data.google_refresh_token
   ) {
     return NextResponse.json(
-      { state: 'error', error: 'Failed to get Google tokens' },
-      { status: 500 }
+      { state: 'not-connected', signInUrl: getAuthURL({ user_uuid }) },
+      { status: 200 }
     );
   }
 
@@ -51,6 +53,12 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
     refresh_token: googleTokens.data.google_refresh_token,
   });
 
+  // Save tokens if they change
+  client.on(
+    'tokens',
+    onGoogleClientTokens({ googleBlobRepository, user_uuid })
+  );
+
   const googlePickSession =
     await googleBlobRepository.getGooglePickSession(user_uuid);
 
@@ -59,8 +67,8 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
     !googlePickSession.data.google_pick_session_id
   ) {
     return NextResponse.json({
-      state: 'not-connected',
-      signInUrl: getAuthURL({ user_uuid }),
+      state: 'connected-no-pictures',
+      // signInUrl: getAuthURL({ user_uuid }),
     });
   }
 

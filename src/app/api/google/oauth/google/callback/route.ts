@@ -32,7 +32,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   await googleBlobRepository.setGoogleTokens({
     user_uuid: state,
     google_access_token: tokens.access_token,
-    google_access_token_expires_at: new Date(tokens.expiry_date),
+    // google_access_token_expires_at: new Date(tokens.expiry_date),
     google_scope: tokens.scope,
   });
 

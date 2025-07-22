@@ -80,20 +80,41 @@ export class GoogleBlobRepository {
   setGoogleTokens = async ({
     user_uuid,
     google_access_token,
-    google_access_token_expires_at,
+    // google_access_token_expires_at,
     google_scope,
   }: {
     user_uuid: string;
     google_access_token: string;
-    google_access_token_expires_at: Date;
+    // google_access_token_expires_at: Date;
     google_scope: string;
   }) => {
     await this.supabaseClient
       .from(googlePhotosTableName)
       .update({
         google_access_token,
-        google_access_token_expires_at,
+        // google_access_token_expires_at,
         google_scope,
+      })
+      .eq('id', user_uuid);
+  };
+
+  setGoogleAccessToken = async ({
+    user_uuid,
+    google_access_token,
+    // google_access_token_expires_at,
+    // google_scope,
+  }: {
+    user_uuid: string;
+    google_access_token: string;
+    // google_access_token_expires_at: Date;
+    // google_scope: string;
+  }) => {
+    await this.supabaseClient
+      .from(googlePhotosTableName)
+      .update({
+        google_access_token,
+        // google_access_token_expires_at,
+        // google_scope,
       })
       .eq('id', user_uuid);
   };

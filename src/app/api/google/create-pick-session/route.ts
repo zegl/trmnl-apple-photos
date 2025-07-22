@@ -6,6 +6,7 @@ import {
   CreatePickSessionResponse,
   GooglePickingSessionResponseSchema,
 } from './type';
+import { onGoogleClientTokens } from '@/google/auth-refresher';
 
 export async function POST(
   request: Request
@@ -42,6 +43,12 @@ export async function POST(
     access_token: googleTokens.data.google_access_token,
     refresh_token: googleTokens.data.google_refresh_token,
   });
+
+  // Save tokens if they change
+  client.on(
+    'tokens',
+    onGoogleClientTokens({ googleBlobRepository, user_uuid })
+  );
 
   const create = await client.request({
     url: 'https://photospicker.googleapis.com/v1/sessions',

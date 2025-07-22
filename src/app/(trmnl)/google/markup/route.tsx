@@ -5,6 +5,7 @@ import { GoogleBlobRepository } from '@/google/blobs';
 import { getClient } from '@/google/auth';
 import { listImagesInAlbum } from '@/google/album';
 import { put } from '@vercel/blob';
+import { onGoogleClientTokens } from '@/google/auth-refresher';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -58,10 +59,17 @@ export async function POST(request: Request) {
     show_message = 'This album is not connected to Google Photos';
   } else {
     const client = getClient();
+
     client.setCredentials({
       access_token: googleTokens.data.google_access_token,
       refresh_token: googleTokens.data.google_refresh_token,
     });
+
+    // Save tokens if they change
+    client.on(
+      'tokens',
+      onGoogleClientTokens({ googleBlobRepository, user_uuid })
+    );
 
     const mediaItems = await listImagesInAlbum({
       client,

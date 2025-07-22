@@ -34,13 +34,17 @@ export const listImagesInAlbum = async ({
   while (true) {
     const url = `https://photospicker.googleapis.com/v1/mediaItems?sessionId=${google_pick_session_id}&pageSize=100${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
 
-    console.log('url', url);
-    const media = await client.request({
-      url,
-      method: 'GET',
-    });
+    let media: any = null;
 
-    console.log('media', media);
+    try {
+      media = await client.request({
+        url,
+        method: 'GET',
+      });
+    } catch (error) {
+      console.error('Error fetching media items', error);
+      return { success: false, error: 'Error fetching media items' };
+    }
 
     const mediaItemsResponse = GoogleMediaItemsResponseSchema.safeParse(
       media.data

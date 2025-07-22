@@ -23,27 +23,37 @@ export default function Client({
   const fetchAppState = async () => {
     setAppStateLoading(true);
 
-    try {
-      const response = await fetch(`/api/google/get-app-state`, {
-        method: 'POST',
-        body: JSON.stringify({ user_uuid }),
+    // try {
+    const response = await fetch(`/api/google/get-app-state`, {
+      method: 'POST',
+      body: JSON.stringify({ user_uuid }),
+    })
+      .catch((error) => {
+        console.error('Error fetching app state', error);
+        setAppState(null);
+      })
+      .finally(() => {
+        setAppStateLoading(false);
       });
 
-      if (response.ok) {
-        const data = AppState.safeParse(await response.json());
-        if (data.success) {
-          setAppState(data.data);
-        } else {
-          setAppState(null);
-        }
-      } else {
-        setAppState(null);
-      }
-    } catch (error) {
+    console.log('response', response);
+
+    // if (response && response.ok) {
+    const data = AppState.safeParse(await response.json());
+    if (data.success) {
+      setAppState(data.data);
+    } else {
       setAppState(null);
-    } finally {
-      setAppStateLoading(false);
     }
+    // } else {
+    //   setAppState(null);
+    // }
+    // } catch (error) {
+    //   console.error('Error fetching app state', error);
+    //   setAppState(null);
+    // } finally {
+    //   setAppStateLoading(false);
+    // }
   };
 
   const createAlbum = async () => {
@@ -97,10 +107,7 @@ export default function Client({
     fetchAppState();
   }, []);
 
-  const canCreateNewAlbum =
-    appState &&
-    (appState.state === 'connected-no-pictures' ||
-      appState.state === 'connected-pictures');
+  const canCreateNewAlbum = appState && appState.state === 'connected-pictures';
 
   if (!appState) {
     return <div>Loading...</div>;
@@ -166,6 +173,10 @@ export default function Client({
           )}
           {appState.imageCount === 0 && <p>Processing photos...</p>}
         </>
+      )}
+
+      {appState.state === 'error' && (
+        <p className="text-red-500">{appState.error}</p>
       )}
 
       {canCreateNewAlbum && (
