@@ -1,3 +1,12 @@
+import 'module-alias/register';
+import path from 'path';
+import moduleAlias from 'module-alias';
+
+// Add path aliases
+moduleAlias.addAliases({
+  '@': path.join(__dirname, '../src'),
+});
+
 import {
   ConcurrencyLimitStrategy,
   Hatchet,
@@ -5,9 +14,9 @@ import {
   RateLimitDuration,
   type TaskFn,
 } from '@hatchet-dev/typescript-sdk';
-import { AppleBlobRepository } from '../src/apple/blobs';
-import { crawlAlbum } from '../src/apple/crawl';
-import { getGenericSupabaseClient } from '../src/supabase';
+import { AppleBlobRepository } from '@/apple/blobs';
+import { crawlAlbum } from '@/apple/crawl';
+import { getGenericSupabaseClient } from '@/supabase';
 
 export const hatchet = Hatchet.init();
 
