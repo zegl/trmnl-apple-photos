@@ -127,9 +127,7 @@ const chunked = (arr: string[], size: number) => {
 
 export const onCron = hatchet.workflow({
   name: 'trmnl-apple-photos-cron',
-  on: {
-    cron: '0 0 * * *', // once per day at midnight
-  },
+  onCrons: ['0 0 * * *'], // once per day at midnight
 });
 
 onCron.task({

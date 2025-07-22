@@ -16,7 +16,7 @@
     "worker:start-built": "node dist/worker/worker/main.js"
   },
   "dependencies": {
-    "@hatchet-dev/typescript-sdk": "^1.6.3",
+    "@hatchet-dev/typescript-sdk": "^1.9.3",
     "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/jsonwebtoken": "^9.0.9",

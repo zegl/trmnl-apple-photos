@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@hatchet-dev/typescript-sdk':
-        specifier: ^1.6.3
-        version: 1.6.3
+        specifier: ^1.9.3
+        version: 1.9.3
       '@supabase/supabase-js':
         specifier: ^2.49.4
         version: 2.49.4
@@ -311,8 +311,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hatchet-dev/typescript-sdk@1.6.3':
-    resolution: {integrity: sha512-JKejabGJgY0FJ/zCjMojC73/NtWXj/n1lCBF8nQsv8YKpHwLUK/VSbcM0UecgZVVrpo1t7IoMAOp9LU2rwhkFw==}
+  '@hatchet-dev/typescript-sdk@1.9.3':
+    resolution: {integrity: sha512-TzUDsUqx0Rsypfq/fP5XUyGQfcym7oCTY5OEFflPo/mx+Znq5b4NwyfNwFqfBmM88+bqcQFGu+U0nznrbuEV4w==}
 
   '@img/sharp-darwin-arm64@0.34.1':
     resolution: {integrity: sha512-pn44xgBtgpEbZsu+lWf2KNb6OAf70X68k+yk69Ic2Xz11zHR/w24/U49XT7AeRwJ0Px+mhALhU5LPci1Aymk7A==}
@@ -1465,7 +1465,7 @@ snapshots:
       protobufjs: 7.5.3
       yargs: 17.7.2
 
-  '@hatchet-dev/typescript-sdk@1.6.3':
+  '@hatchet-dev/typescript-sdk@1.9.3':
     dependencies:
       '@bufbuild/protobuf': 2.5.1
       '@types/qs': 6.14.0
