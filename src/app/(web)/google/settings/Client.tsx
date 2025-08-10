@@ -38,16 +38,16 @@ export default function Client({
 
     console.log('response', response);
 
-    // if (response && response.ok) {
-    const data = AppState.safeParse(await response.json());
-    if (data.success) {
-      setAppState(data.data);
+    if (response && response.ok) {
+      const data = AppState.safeParse(await response.json());
+      if (data.success) {
+        setAppState(data.data);
+      } else {
+        setAppState(null);
+      }
     } else {
       setAppState(null);
     }
-    // } else {
-    //   setAppState(null);
-    // }
     // } catch (error) {
     //   console.error('Error fetching app state', error);
     //   setAppState(null);

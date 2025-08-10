@@ -38,6 +38,8 @@ export class AppleBlobRepository {
       };
     }
 
+    console.error('Error parsing user blob', parsed.error);
+
     return {
       success: false,
       error: 'User blob not found',
