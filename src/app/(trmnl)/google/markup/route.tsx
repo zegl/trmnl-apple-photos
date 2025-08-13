@@ -86,24 +86,17 @@ export async function POST(request: Request) {
         const randomIndex = Math.floor(Math.random() * photos.length);
         const randomImage = photos[randomIndex];
 
-        // Download the image from Google Photos
-
         const photoBytes = await client.request({
           url: randomImage.mediaFile.baseUrl + '=w1024-h1024',
           method: 'GET',
         });
 
-        console.log('photoBytes', photoBytes);
-
-        // Upload to Vercel Blobs
-        // generate a random name
-        // const randomName = Math.random().toString(36).substring(2, 15);
         const { url } = await put(
           user_uuid + '.jpg',
           photoBytes.data as string,
           {
             access: 'public',
-            addRandomSuffix: true,
+            allowOverwrite: true,
             token: process.env.BLOB_GOOGLE_READ_WRITE_TOKEN,
           }
         );
