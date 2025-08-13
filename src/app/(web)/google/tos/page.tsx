@@ -1,10 +1,4 @@
-import { GoogleBlobRepository } from '@/google/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
-import FullScreenMessage from '@/app/FullScreenMessage';
-
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import Client from './Client';
 
 export const metadata: Metadata = {
   title: 'Google Photos for TRMNL',
