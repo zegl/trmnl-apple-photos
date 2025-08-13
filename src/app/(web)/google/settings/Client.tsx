@@ -160,9 +160,9 @@ export default function Client({
           {appState.imageCount > 0 && (
             <>
               <p>
-                Your album with {appState.imageCount} pictures is ready. A
-                photos will be displayed on your TRMNL device the next time the
-                plugin is refreshed.
+                Your album with {appState.imageCount} pictures is ready. A random
+                photo from your album will be displayed on your TRMNL device the
+                next time the plugin is refreshed.
               </p>
               <div>
                 <PrimaryButton href={backToTrmnlUrl}>
