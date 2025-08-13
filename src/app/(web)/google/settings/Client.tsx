@@ -23,7 +23,6 @@ export default function Client({
   const fetchAppState = async () => {
     setAppStateLoading(true);
 
-    // try {
     const response = await fetch(`/api/google/get-app-state`, {
       method: 'POST',
       body: JSON.stringify({ user_uuid }),
@@ -48,12 +47,6 @@ export default function Client({
     } else {
       setAppState(null);
     }
-    // } catch (error) {
-    //   console.error('Error fetching app state', error);
-    //   setAppState(null);
-    // } finally {
-    //   setAppStateLoading(false);
-    // }
   };
 
   const createAlbum = async () => {
@@ -127,6 +120,17 @@ export default function Client({
           <PrimaryButton href={appState.signInUrl}>
             Sign in with Google
           </PrimaryButton>
+
+          <div
+            className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4"
+            role="alert"
+          >
+            <p className="font-bold">Beware</p>
+            <p>
+              This app has not been approved by Google (yet!). The installation
+              process will look a little bit sketchy until it is approved.
+            </p>
+          </div>
         </>
       )}
 
@@ -160,9 +164,9 @@ export default function Client({
           {appState.imageCount > 0 && (
             <>
               <p>
-                Your album with {appState.imageCount} pictures is ready. A random
-                photo from your album will be displayed on your TRMNL device the
-                next time the plugin is refreshed.
+                Your album with {appState.imageCount} pictures is ready. A
+                random photo from your album will be displayed on your TRMNL
+                device the next time the plugin is refreshed.
               </p>
               <div>
                 <PrimaryButton href={backToTrmnlUrl}>
