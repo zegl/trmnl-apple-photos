@@ -1,45 +1,16 @@
 import { NextResponse } from 'next/server';
+import { GoogleBlobRepository } from '@/google/blobs';
+import { getSupabaseClientForUser } from '@/supabase';
 
-const getEnvOrThrow = (key: string): string => {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Environment variable ${key} is not set.`);
-  }
-  return value;
-};
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = await request.json();
 
-export async function GET(request: Request): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const code = searchParams.get('code');
-  const installationCallbackUrl = searchParams.get('installation_callback_url');
+  const supabaseClient = getSupabaseClientForUser(body.user.uuid);
+  const googleBlobRepository = new GoogleBlobRepository(supabaseClient);
 
-  if (!code || !installationCallbackUrl) {
-    return NextResponse.json(
-      { error: 'Missing code or installation_callback_url' },
-      { status: 400 }
-    );
-  }
+  await googleBlobRepository.saveUserBlob(body.user.uuid, body);
 
-  const formData = new URLSearchParams();
-  formData.append('code', code);
-  formData.append('client_id', getEnvOrThrow('TRMNL_CLIENT_ID'));
-  formData.append('client_secret', getEnvOrThrow('TRMNL_CLIENT_SECRET'));
-  formData.append('grant_type', 'authorization_code');
+  console.log('Installed user', body.user.uuid);
 
-  const fetchTokenResponse = await fetch('https://usetrmnl.com/oauth/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: formData.toString(),
-  });
-  const fetchTokenData = await fetchTokenResponse.json();
-  const _accessToken = fetchTokenData.access_token;
-  console.log('fetchTokenData', fetchTokenData);
-
-  if (fetchTokenData.error) {
-    return NextResponse.json({ ...fetchTokenData }, { status: 400 });
-  }
-
-  return NextResponse.redirect(installationCallbackUrl);
+  return NextResponse.json({ message: 'Installation successful' });
 }
