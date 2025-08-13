@@ -16,7 +16,7 @@ export function getClient(): OAuth2Client {
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     process.env.VERCEL === '1'
-      ? 'https://trmnl-google-photos.vercel.app/api/google/oauth/google/callback'
+      ? 'https://trmnl-google-photos.westling.dev/api/google/oauth/google/callback'
       : 'http://localhost:3003/api/google/oauth/google/callback'
   );
 }
