@@ -98,6 +98,7 @@ export async function POST(request: Request) {
             access: 'public',
             allowOverwrite: true,
             token: process.env.BLOB_GOOGLE_READ_WRITE_TOKEN,
+            cacheControlMaxAge: 60, // 1 minute
           }
         );
 
