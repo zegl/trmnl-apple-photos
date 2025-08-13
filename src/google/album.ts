@@ -43,7 +43,7 @@ export const listImagesInAlbum = async ({
       });
     } catch (error) {
       console.error('Error fetching media items', error);
-      return { success: false, error: 'Error fetching media items' };
+      return { success: false, error: 'Error fetching media items:' + error };
     }
 
     const mediaItemsResponse = GoogleMediaItemsResponseSchema.safeParse(

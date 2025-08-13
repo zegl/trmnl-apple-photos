@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/markup') &&
     !request.nextUrl.pathname.startsWith('/google/markup');
 
-  const devDefault: string = 'apple';
+  const devDefault: string = 'google';
 
   const isGoogleHost =
     request.nextUrl.hostname === 'trmnl-google-photos.westling.dev';
@@ -22,21 +22,7 @@ export function middleware(request: NextRequest) {
   const isGooglePhotosRoute = isRoute && (isGoogleHost || fallbackToGoogle);
   const isApplePhotosRoute = isRoute && (isAppleHost || fallbackToApple);
 
-  console.log('middleware', {
-    isRoute,
-    hostname: request.nextUrl.hostname,
-    host: request.nextUrl.host,
-    isGoogleHost,
-    isAppleHost,
-    isAnyHost,
-    fallbackToGoogle,
-    fallbackToApple,
-    isGooglePhotosRoute,
-    isApplePhotosRoute,
-  });
-
   if (isGooglePhotosRoute) {
-    console.log('rewriting to google', request.nextUrl.pathname);
     return NextResponse.rewrite(
       new URL(
         `/google${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -46,7 +32,6 @@ export function middleware(request: NextRequest) {
   }
 
   if (isApplePhotosRoute) {
-    console.log('rewriting to apple', request.nextUrl.pathname);
     return NextResponse.rewrite(
       new URL(
         `/apple${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -55,6 +40,5 @@ export function middleware(request: NextRequest) {
     );
   }
 
-  console.log('not rewriting', request.nextUrl.pathname);
   return NextResponse.next();
 }

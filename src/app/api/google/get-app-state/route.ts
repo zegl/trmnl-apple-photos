@@ -68,7 +68,6 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
   ) {
     return NextResponse.json({
       state: 'connected-no-pictures',
-      // signInUrl: getAuthURL({ user_uuid }),
     });
   }
 
@@ -79,6 +78,21 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
     });
 
     if (!mediaItems.success) {
+      if (mediaItems.error.includes('invalid_grant')) {
+        return NextResponse.json(
+          { state: 'not-connected', signInUrl: getAuthURL({ user_uuid }) },
+          { status: 200 }
+        );
+      }
+
+      if (
+        mediaItems.error.includes('Access to the requested session has expired')
+      ) {
+        return NextResponse.json({
+          state: 'connected-no-pictures',
+        });
+      }
+
       return NextResponse.json(
         { state: 'error', error: mediaItems.error },
         { status: 500 }
