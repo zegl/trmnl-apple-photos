@@ -5,6 +5,7 @@ import FullScreenMessage from '@/app/FullScreenMessage';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Client from './Client';
+import { getDynamoDBClient } from '@/dynamodb';
 
 export const metadata: Metadata = {
   title: 'Google Photos for TRMNL',
@@ -24,11 +25,12 @@ export default async function Page({
     return <FullScreenMessage message="Bad Request: UUID is not a string" />;
   }
 
-  const supabaseClient = getSupabaseClientForUser(uuid);
-  const googleBlobRepository = new GoogleBlobRepository(supabaseClient);
+  const dynamoDBClient = getDynamoDBClient();
+  const googleBlobRepository = new GoogleBlobRepository(dynamoDBClient);
 
   const user = await googleBlobRepository.getUserBlob(uuid);
   if (!user.success) {
+    console.log('user', user);
     return <FullScreenMessage message="User not found :-(" />;
   }
 

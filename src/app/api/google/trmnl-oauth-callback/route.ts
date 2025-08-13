@@ -23,7 +23,10 @@ export async function GET(request: Request): Promise<NextResponse> {
   const formData = new URLSearchParams();
   formData.append('code', code);
   formData.append('client_id', getEnvOrThrow('TRMNL_GOOGLE_PHOTOS_CLIENT_ID'));
-  formData.append('client_secret', getEnvOrThrow('TRMNL_GOOGLE_PHOTOS_CLIENT_SECRET'));
+  formData.append(
+    'client_secret',
+    getEnvOrThrow('TRMNL_GOOGLE_PHOTOS_CLIENT_SECRET')
+  );
   formData.append('grant_type', 'authorization_code');
 
   const fetchTokenResponse = await fetch('https://usetrmnl.com/oauth/token', {

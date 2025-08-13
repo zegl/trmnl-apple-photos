@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseClientForUser } from '@/supabase';
 import Render from '@/app/Render';
 import { GoogleBlobRepository } from '@/google/blobs';
 import { getClient } from '@/google/auth';
 import { listImagesInAlbum } from '@/google/album';
 import { put } from '@vercel/blob';
 import { onGoogleClientTokens } from '@/google/auth-refresher';
+import { getDynamoDBClient } from '@/dynamodb';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -41,8 +41,8 @@ export async function POST(request: Request) {
   const params = new URLSearchParams();
   params.append('user_uuid', user_uuid);
 
-  const supabaseClient = getSupabaseClientForUser(user_uuid);
-  const googleBlobRepository = new GoogleBlobRepository(supabaseClient);
+  const dynamoDBClient = getDynamoDBClient();
+  const googleBlobRepository = new GoogleBlobRepository(dynamoDBClient);
 
   let show_message: string | undefined;
   let image_url: string | undefined;

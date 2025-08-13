@@ -1,12 +1,11 @@
 import { getAuthURL, getClient } from '@/google/auth';
 import { GoogleBlobRepository } from '@/google/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { AppState } from './type';
 import { listImagesInAlbum } from '@/google/album';
-import { Credentials } from 'google-auth-library';
 import { onGoogleClientTokens } from '@/google/auth-refresher';
+import { getDynamoDBClient } from '@/dynamodb';
 
 const GooglePickingSessionResponseSchema = z.object({
   id: z.string(),
@@ -30,8 +29,8 @@ export async function POST(request: Request): Promise<NextResponse<AppState>> {
     );
   }
 
-  const supabaseClient = getSupabaseClientForUser(user_uuid);
-  const googleBlobRepository = new GoogleBlobRepository(supabaseClient);
+  const dynamoDBClient = getDynamoDBClient();
+  const googleBlobRepository = new GoogleBlobRepository(dynamoDBClient);
 
   const googleTokens = await googleBlobRepository.getGoogleTokens(user_uuid);
 

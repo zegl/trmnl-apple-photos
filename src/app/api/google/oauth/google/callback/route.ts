@@ -1,6 +1,6 @@
 import { getClient } from '@/google/auth';
 import { GoogleBlobRepository } from '@/google/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
+import { getDynamoDBClient } from '@/dynamodb';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -15,8 +15,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  const supabaseClient = getSupabaseClientForUser(state);
-  const googleBlobRepository = new GoogleBlobRepository(supabaseClient);
+  const dynamoDBClient = getDynamoDBClient();
+  const googleBlobRepository = new GoogleBlobRepository(dynamoDBClient);
 
   // Exchange code for tokens
   const client = getClient();
