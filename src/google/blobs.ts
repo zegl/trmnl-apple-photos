@@ -38,9 +38,11 @@ export class GoogleBlobRepository {
   };
 
   saveUserBlob = async (uuid: string, user: UserBlob) => {
-    await this.supabaseClient
+    const x = await this.supabaseClient
       .from(googlePhotosTableName)
       .upsert({ id: uuid, user }, { onConflict: 'id' });
+
+    console.log('saveUserBlob', x);
   };
 
   setUninstalledAt = async (uuid: string) => {

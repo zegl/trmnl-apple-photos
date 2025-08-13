@@ -10,7 +10,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   await googleBlobRepository.saveUserBlob(body.user.uuid, body);
 
-  console.log('Installed user', body.user.uuid);
+  console.log('Installed user', body);
 
   return NextResponse.json({ message: 'Installation successful' });
 }
