@@ -4,6 +4,7 @@ import { AppleSettingsSchema } from '@/apple/types';
 import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { Result } from '@/result';
+import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
 export async function POST(
   request: Request
@@ -13,7 +14,13 @@ export async function POST(
     const parsedBody = AppleSettingsSchema.parse(body);
 
     const supabaseClient = getSupabaseClientForUser(parsedBody.uuid);
-    const appleBlobRepository = new AppleBlobRepository(supabaseClient);
+    const s3Client = getS3Client();
+    const dynamodbClient = getDynamoDBClient();
+    const appleBlobRepository = new AppleBlobRepository(
+      dynamodbClient,
+      supabaseClient,
+      s3Client
+    );
 
     await appleBlobRepository.saveUserSettings(parsedBody.uuid, parsedBody);
 

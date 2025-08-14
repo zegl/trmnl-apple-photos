@@ -63,10 +63,7 @@ export class AppleBlobRepository {
   }
 
   getUserBlob = async (uuid: string): Promise<Result<UserBlob>> => {
-    const getItemResponse: GetItemResponse<
-      typeof applePhotosEntity,
-      { attributes: ['user'] }
-    > = await applePhotosEntity
+    const { Item } = await applePhotosEntity
       .build(GetItemCommand)
       .key({ id: uuid })
       .options({
@@ -74,8 +71,6 @@ export class AppleBlobRepository {
         attributes: ['user'],
       })
       .send();
-
-    const { Item } = getItemResponse;
 
     if (!Item || !Item.user) {
       return {
