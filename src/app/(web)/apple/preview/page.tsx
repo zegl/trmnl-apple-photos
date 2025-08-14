@@ -1,7 +1,7 @@
 import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
-import { getPhotos } from '@/app/photos';
+import { getPhotos } from '@/apple/photos';
 import Render from '@/app/Render';
 import LinkButton from '@/app/LinkButton';
 import './trmnl-mini.css';

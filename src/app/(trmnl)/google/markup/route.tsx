@@ -38,9 +38,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const params = new URLSearchParams();
-  params.append('user_uuid', user_uuid);
-
   const dynamoDBClient = getDynamoDBClient();
   const googleBlobRepository = new GoogleBlobRepository(dynamoDBClient);
 

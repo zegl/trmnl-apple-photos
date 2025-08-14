@@ -3,80 +3,13 @@ import { crawlAlbum } from '@/apple/crawl';
 import type { Result } from '@/result';
 import {
   fetchPublicAlbumWebAsset,
-  fetchPublicAlbumWebStream,
   getPublicAlbumId,
   type PublicAlbumWebStream,
-} from './apple-public-album';
-import type { AppleSettings } from '@/apple/types';
+} from '@/apple/apple-public-album';
 
 type ImageResult = Result<{
   url: string;
 }>;
-
-const _tryCrawlNewImage = async ({
-  appleBlobRepository,
-  user_uuid,
-  settings,
-}: {
-  appleBlobRepository: AppleBlobRepository;
-  user_uuid: string;
-  settings: AppleSettings;
-}): Promise<ImageResult> => {
-  const getPartitionAndWebStreamResult =
-    await appleBlobRepository.getPartitionAndWebStream(user_uuid);
-  let request_partition = 'p123';
-  if (
-    getPartitionAndWebStreamResult.success &&
-    getPartitionAndWebStreamResult.data.apple_partition
-  ) {
-    request_partition = getPartitionAndWebStreamResult.data.apple_partition;
-  }
-
-  const albumId = getPublicAlbumId(settings.sharedAlbumUrl);
-
-  const { webStream, partition } = await fetchPublicAlbumWebStream(
-    request_partition,
-    albumId
-  );
-
-  await appleBlobRepository.setPartitionAndWebStream({
-    uuid: user_uuid,
-    apple_partition: partition,
-    web_stream_blob: webStream,
-  });
-
-  if (!webStream || webStream.photos.length === 0) {
-    return {
-      success: false,
-      error: 'No photos found in the shared album. :-/',
-    };
-  }
-
-  const randomIndex = Math.floor(Math.random() * webStream.photos.length);
-
-  const photo = webStream.photos[randomIndex];
-
-  const webAsset = await fetchPublicAlbumWebAsset(
-    partition,
-    albumId,
-    photo.photoGuid
-  );
-
-  // Largest derivative
-  const largestDerivative = Object.values(photo.derivatives).reduce((a, b) => {
-    return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
-  });
-
-  const item = webAsset.items[largestDerivative.checksum];
-  const url = `https://${item.url_location}${item.url_path}`;
-
-  return {
-    success: true,
-    data: {
-      url,
-    },
-  };
-};
 
 export const getRandomPhotoFromWebStream = async ({
   partition,
@@ -90,13 +23,6 @@ export const getRandomPhotoFromWebStream = async ({
   const photos = web_stream_blob.photos
     .filter((photo) => photo.mediaAssetType !== 'video')
     .filter((photo) => Object.keys(photo.derivatives).length > 0);
-  // .filter(
-  //   (photo) =>
-  //     photo.width !== undefined &&
-  //     Number.parseInt(photo.width) > 100 &&
-  //     photo.height !== undefined &&
-  //     Number.parseInt(photo.height) > 100
-  // );
 
   if (photos.length === 0) {
     return {

@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   type PublicAlbumWebStream,
   webStreamSchema,
-} from '../app/apple-public-album';
+} from './apple-public-album';
 import { type AppleSettings, AppleSettingsSchema } from '@/apple/types';
 import { type UserBlob, UserBlobSchema } from '@/app/types';
 import type { Result } from '../result';

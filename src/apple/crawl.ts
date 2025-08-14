@@ -1,7 +1,7 @@
 import {
   fetchPublicAlbumWebStream,
   getPublicAlbumId,
-} from '@/app/apple-public-album';
+} from '@/apple/apple-public-album';
 import { AppleBlobRepository } from '@/apple/blobs';
 import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 import { getSupabaseClientForUser } from '@/supabase';

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
-import { getPhotos } from '../../../apple/photos';
+import { getPhotos } from '@/apple/photos';
 import Render from '@/app/Render';
 import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
