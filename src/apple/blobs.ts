@@ -308,34 +308,42 @@ export class AppleBlobRepository {
     }
 
     // Get blob from S3
-    const getBlobCommand = new GetObjectCommand({
-      Bucket: 'trmnl-apple-photos',
-      Key: `${uuid}/web_stream_blob.json`,
-    });
+    try {
+      const getBlobCommand = new GetObjectCommand({
+        Bucket: 'trmnl-apple-photos',
+        Key: `${uuid}/web_stream_blob.json`,
+      });
 
-    const { Body } = await this.s3Client.send(getBlobCommand);
-    const web_stream_blob = await Body?.transformToString();
-    const parsed = webStreamSchema.safeParse(
-      JSON.parse(web_stream_blob ?? '{}')
-    );
+      const { Body } = await this.s3Client.send(getBlobCommand);
+      const web_stream_blob = await Body?.transformToString();
+      const parsed = webStreamSchema.safeParse(
+        JSON.parse(web_stream_blob ?? '{}')
+      );
 
-    if (!parsed.success) {
+      if (!parsed.success) {
+        return {
+          success: false,
+          error: parsed.error.message,
+        };
+      }
+
+      return {
+        success: true,
+        data: {
+          apple_partition: Item.apple_partition,
+          web_stream_blob: parsed.data,
+          web_stream_blob_fetched_at: Item.web_stream_blob_fetched_at
+            ? new Date(Item.web_stream_blob_fetched_at)
+            : undefined,
+        },
+      };
+    } catch (e) {
+      console.error('Error getting web stream blob', e);
       return {
         success: false,
-        error: parsed.error.message,
+        error: `Error getting web stream blob: ${e}`,
       };
     }
-
-    return {
-      success: true,
-      data: {
-        apple_partition: Item.apple_partition,
-        web_stream_blob: parsed.data,
-        web_stream_blob_fetched_at: Item.web_stream_blob_fetched_at
-          ? new Date(Item.web_stream_blob_fetched_at)
-          : undefined,
-      },
-    };
   };
 
   setCrawlStatus = async ({
