@@ -6,7 +6,8 @@ export function middleware(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/_next') &&
     !request.nextUrl.pathname.startsWith('/api') &&
     !request.nextUrl.pathname.startsWith('/markup') &&
-    !request.nextUrl.pathname.startsWith('/google/markup');
+    !request.nextUrl.pathname.startsWith('/google/markup') &&
+    !request.nextUrl.pathname.startsWith('/apple/markup');
 
   const devDefault: string = 'apple';
 
