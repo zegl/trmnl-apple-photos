@@ -1,7 +1,7 @@
 import type { Result } from '../result';
 import { UserBlobSchema, type UserBlob } from '@/app/types';
 import { Table } from 'dynamodb-toolbox/table';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import type { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { item, s } from 'dynamodb-toolbox/schema';
 import { Entity } from 'dynamodb-toolbox/entity';

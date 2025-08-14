@@ -162,7 +162,6 @@ export const getPhotos = async ({
       albumId: getPublicAlbumId(settings.data.sharedAlbumUrl),
       web_stream_blob: webStreamResult.data.web_stream_blob,
     });
-    console.log('imageFromCachedWebStream', imageFromCachedWebStream);
     if (imageFromCachedWebStream.success) {
       return imageFromCachedWebStream;
     }
