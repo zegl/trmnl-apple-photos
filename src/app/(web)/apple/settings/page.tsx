@@ -5,6 +5,7 @@ import FullScreenMessage from '@/app/FullScreenMessage';
 import AlbumForm from './AlbumForm';
 
 import type { Metadata } from 'next';
+import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
 export const metadata: Metadata = {
   title: 'Apple Photos for TRMNL',
@@ -25,7 +26,13 @@ export default async function Page({
   }
 
   const supabaseClient = getSupabaseClientForUser(uuid);
-  const appleBlobRepository = new AppleBlobRepository(supabaseClient);
+  const s3Client = getS3Client();
+  const dynamodbClient = getDynamoDBClient();
+  const appleBlobRepository = new AppleBlobRepository(
+    dynamodbClient,
+    supabaseClient,
+    s3Client
+  );
 
   const user = await appleBlobRepository.getUserBlob(uuid);
   if (!user.success) {

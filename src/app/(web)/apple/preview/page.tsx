@@ -7,6 +7,7 @@ import LinkButton from '@/app/LinkButton';
 import './trmnl-mini.css';
 
 import type { Metadata } from 'next';
+import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
 export const metadata: Metadata = {
   title: 'Apple Photos for TRMNL',
@@ -35,7 +36,13 @@ export default async function Page({
   }
 
   const supabaseClient = getSupabaseClientForUser(user_uuid);
-  const appleBlobRepository = new AppleBlobRepository(supabaseClient);
+  const s3Client = getS3Client();
+  const dynamodbClient = getDynamoDBClient();
+  const appleBlobRepository = new AppleBlobRepository(
+    dynamodbClient,
+    supabaseClient,
+    s3Client
+  );
 
   const user = await appleBlobRepository.getUserBlob(user_uuid);
   if (!user.success) {
@@ -48,6 +55,7 @@ export default async function Page({
     crawl_if_missing: true,
   });
   if (!photos.success) {
+    console.error('photos', photos);
     return <FullScreenMessage message={photos.error} />;
   }
 

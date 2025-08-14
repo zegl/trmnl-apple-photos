@@ -3,6 +3,7 @@ import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { getPhotos } from '../../photos';
 import Render from '@/app/Render';
+import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
 export async function POST(request: Request) {
   // Extract data from POST request as form data
@@ -39,7 +40,13 @@ export async function POST(request: Request) {
   params.append('user_uuid', user_uuid);
 
   const supabaseClient = getSupabaseClientForUser(user_uuid);
-  const appleBlobRepository = new AppleBlobRepository(supabaseClient);
+  const s3Client = getS3Client();
+  const dynamodbClient = getDynamoDBClient();
+  const appleBlobRepository = new AppleBlobRepository(
+    dynamodbClient,
+    supabaseClient,
+    s3Client
+  );
 
   const photos = await getPhotos({
     appleBlobRepository,

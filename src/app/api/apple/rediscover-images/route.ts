@@ -4,6 +4,8 @@ import { AppleBlobRepository } from '@/apple/blobs';
 import { getSupabaseClientForUser } from '@/supabase';
 import { AppleRediscoverImagesRequestSchema } from './type';
 import { Result } from '@/result';
+import { getDynamoDBClient } from '@/dynamodb';
+import { getS3Client } from '@/dynamodb';
 
 export async function POST(
   request: Request
@@ -13,7 +15,13 @@ export async function POST(
     const parsedBody = AppleRediscoverImagesRequestSchema.parse(body);
 
     const supabaseClient = getSupabaseClientForUser(parsedBody.user_uuid);
-    const appleBlobRepository = new AppleBlobRepository(supabaseClient);
+    const s3Client = getS3Client();
+    const dynamodbClient = getDynamoDBClient();
+    const appleBlobRepository = new AppleBlobRepository(
+      dynamodbClient,
+      supabaseClient,
+      s3Client
+    );
 
     const hatchet = Hatchet.init();
 

@@ -14,16 +14,24 @@ export default async function Page() {
 
       <ul className="list-disc list-inside">
         <li>
-          The plugin stores data on AWS in the Europan Union, and on Vercel in the USA.
+          The plugin stores data on AWS in the Europan Union, and on Vercel in
+          the USA.
         </li>
         <li>
-          The plugin stores the following data from the connected TRMNL account: The full user object, including name, email, user time zone, and plugin setting id.
+          The plugin stores the following data from the connected TRMNL account:
+          The full user object, including name, email, user time zone, and
+          plugin setting id.
         </li>
         <li>
-          The plugin stores the following data from the connected Google account: Oauth access and refresh tokens, linked "Google Photos" picking session id. The latest image rendered on the TRMNL is stored on Vercel Blobs (CDN).
+          The plugin stores the following data from the connected Google
+          account: Oauth access and refresh tokens, linked "Google Photos"
+          picking session id. The latest image rendered on the TRMNL is stored
+          on Vercel Blobs (CDN).
         </li>
         <li>
-          The plugin stores the following data about usage: The number of times the plugin plugin has been "rendered", when it was last rendered, and when the plugin was first installed.
+          The plugin stores the following data about usage: The number of times
+          the plugin plugin has been "rendered", when it was last rendered, and
+          when the plugin was first installed.
         </li>
       </ul>
     </div>

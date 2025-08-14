@@ -57,18 +57,14 @@ export default function Home() {
 
       <p className="text-sm text-gray-500">
         This plugin is not affiliated with Google or Google Photos. See the{' '}
-        <a
-          className="text-blue-500"
-          href="/terms-of-service"
-        >
+        <a className="text-blue-500" href="/terms-of-service">
           Terms of Service
-        </a> and the{' '}
-        <a
-          className="text-blue-500"
-          href="/privacy-policy"
-        >
+        </a>{' '}
+        and the{' '}
+        <a className="text-blue-500" href="/privacy-policy">
           Privacy Policy
-        </a>.
+        </a>
+        .
       </p>
     </div>
   );

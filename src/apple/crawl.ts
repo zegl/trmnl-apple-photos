@@ -3,6 +3,7 @@ import {
   getPublicAlbumId,
 } from '@/app/apple-public-album';
 import { AppleBlobRepository } from '@/apple/blobs';
+import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 import { getSupabaseClientForUser } from '@/supabase';
 
 export const crawlAlbum = async ({
@@ -22,9 +23,14 @@ export const crawlAlbum = async ({
 
   logger.info(`Refreshing album: ${JSON.stringify({ user_uuid })}`);
 
-  const supabase = getSupabaseClientForUser(user_uuid);
-
-  const appleBlobRepository = new AppleBlobRepository(supabase);
+  const supabaseClient = getSupabaseClientForUser(user_uuid);
+  const s3Client = getS3Client();
+  const dynamodbClient = getDynamoDBClient();
+  const appleBlobRepository = new AppleBlobRepository(
+    dynamodbClient,
+    supabaseClient,
+    s3Client
+  );
 
   await appleBlobRepository.setCrawlStatus({
     uuid: user_uuid,

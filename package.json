@@ -13,10 +13,12 @@
     "lint:biome:fix": "biome check --apply.",
     "worker:start": "tsx worker/main.ts",
     "worker:build": "tsc -p tsconfig.worker.json",
-    "worker:start-built": "node dist/worker/worker/main.js"
+    "worker:start-built": "node dist/worker/worker/main.js",
+    "migrate": "tsx src/apple/migrate.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.864.0",
+    "@aws-sdk/client-s3": "^3.864.0",
     "@aws-sdk/lib-dynamodb": "^3.864.0",
     "@hatchet-dev/typescript-sdk": "^1.9.3",
     "@supabase/supabase-js": "^2.49.4",
