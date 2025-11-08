@@ -48,5 +48,20 @@ export function proxy(request: NextRequest) {
     );
   }
 
+  // Set Content-Type to application/x-www-form-urlencoded for requests to /apple/markup
+  if (request.nextUrl.pathname === '/apple/markup') {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('Content-Type', 'application/x-www-form-urlencoded');
+
+    console.log("Overriding Content-Type to application/x-www-form-urlencoded for /apple/markup");
+    
+    // Forward the request with modified headers to downstream
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
   return NextResponse.next();
 }
