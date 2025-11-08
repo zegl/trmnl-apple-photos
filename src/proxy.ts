@@ -3,7 +3,11 @@ import type { NextRequest } from 'next/server';
 
 export function proxy(request: NextRequest) {
   // Log headers
-  console.log('Headers:', request.headers);
+  if (request.nextUrl.pathname.includes('markup')) {
+    console.log('markup headers', request.headers);
+    console.log('markup pathname', request.nextUrl.pathname);
+    console.log('markup search', request.nextUrl.search);
+  }
 
   const isRoute =
     !request.nextUrl.pathname.startsWith('/_next') &&
