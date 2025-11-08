@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint:biome": "biome check .",
@@ -17,35 +17,43 @@
     "migrate": "tsx src/apple/migrate.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.864.0",
-    "@aws-sdk/client-s3": "^3.864.0",
-    "@aws-sdk/lib-dynamodb": "^3.864.0",
-    "@hatchet-dev/typescript-sdk": "^1.9.3",
-    "@supabase/supabase-js": "^2.49.4",
-    "@tailwindcss/postcss": "^4.1.11",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@vercel/blob": "^1.0.1",
-    "@vercel/edge-config": "^1.4.0",
-    "dynamodb-toolbox": "^2.7.1",
-    "google-auth-library": "^10.1.0",
+    "@aws-sdk/client-dynamodb": "^3.927.0",
+    "@aws-sdk/client-s3": "^3.927.0",
+    "@aws-sdk/lib-dynamodb": "^3.927.0",
+    "@hatchet-dev/typescript-sdk": "^1.10.1",
+    "@supabase/supabase-js": "^2.80.0",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@vercel/blob": "^1.1.1",
+    "@vercel/edge-config": "^1.4.3",
+    "dynamodb-toolbox": "^2.7.2",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
-    "next": "15.3.2",
+    "next": "16.0.1",
     "postcss": "^8.5.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-hook-form": "^7.56.4",
-    "tailwindcss": "^4.1.11",
-    "tsx": "^4.19.4",
-    "zod": "^3.24.4"
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "^7.66.0",
+    "tailwindcss": "^4.1.17",
+    "tsx": "^4.20.6",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.0-beta.5",
+    "@biomejs/biome": "^2.3.4",
     "@types/module-alias": "^2.0.4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "typescript": "^5"
+    "@types/node": "^20.19.24",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "16.0.1",
+    "typescript": "^5.9.3"
   },
-  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
+  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.2",
+      "@types/react-dom": "19.2.2"
+    }
+  }
 }
