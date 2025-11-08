@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { AppleBlobRepository } from '@/apple/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
+// import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
 import AlbumForm from './AlbumForm';
 
@@ -25,12 +25,12 @@ export default async function Page({
     return <FullScreenMessage message="Bad Request: UUID is not a string" />;
   }
 
-  const supabaseClient = getSupabaseClientForUser(uuid);
+  // const supabaseClient = getSupabaseClientForUser(uuid);
   const s3Client = getS3Client();
   const dynamodbClient = getDynamoDBClient();
   const appleBlobRepository = new AppleBlobRepository(
     dynamodbClient,
-    supabaseClient,
+    // supabaseClient,
     s3Client
   );
 

@@ -1,5 +1,5 @@
 import { AppleBlobRepository } from '@/apple/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
+// import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
 import { getPhotos } from '@/apple/photos';
 import Render from '@/app/Render';
@@ -35,12 +35,12 @@ export default async function Page({
     return <FullScreenMessage message="Bad Request: size is not a string" />;
   }
 
-  const supabaseClient = getSupabaseClientForUser(user_uuid);
+  // const supabaseClient = getSupabaseClientForUser(user_uuid);
   const s3Client = getS3Client();
   const dynamodbClient = getDynamoDBClient();
   const appleBlobRepository = new AppleBlobRepository(
     dynamodbClient,
-    supabaseClient,
+    // supabaseClient,
     s3Client
   );
 

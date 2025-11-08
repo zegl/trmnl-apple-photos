@@ -1,5 +1,5 @@
 import { GoogleBlobRepository } from '@/google/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
+// import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
 
 import type { Metadata } from 'next';

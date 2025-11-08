@@ -21,7 +21,6 @@
     "@aws-sdk/client-s3": "^3.927.0",
     "@aws-sdk/lib-dynamodb": "^3.927.0",
     "@hatchet-dev/typescript-sdk": "^1.10.1",
-    "@supabase/supabase-js": "^2.80.0",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/jsonwebtoken": "^9.0.10",
     "@vercel/blob": "^1.1.1",

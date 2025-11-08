@@ -2,7 +2,7 @@ import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
 import { NextResponse } from 'next/server';
 import { AppleSettingsSchema } from '@/apple/types';
 import { AppleBlobRepository } from '@/apple/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
+// import { getSupabaseClientForUser } from '@/supabase';
 import { Result } from '@/result';
 import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
@@ -13,12 +13,12 @@ export async function POST(
     const body = await request.json();
     const parsedBody = AppleSettingsSchema.parse(body);
 
-    const supabaseClient = getSupabaseClientForUser(parsedBody.uuid);
+    // const supabaseClient = getSupabaseClientForUser(parsedBody.uuid);
     const s3Client = getS3Client();
     const dynamodbClient = getDynamoDBClient();
     const appleBlobRepository = new AppleBlobRepository(
       dynamodbClient,
-      supabaseClient,
+      // supabaseClient,
       s3Client
     );
 

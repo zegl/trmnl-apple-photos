@@ -16,7 +16,7 @@ import {
 } from '@hatchet-dev/typescript-sdk';
 import { AppleBlobRepository } from '@/apple/blobs';
 import { crawlAlbum } from '@/apple/crawl';
-import { getGenericSupabaseClient } from '@/supabase';
+// import { getGenericSupabaseClient } from '@/supabase';
 import { getDynamoDBClient, getS3Client } from '@/dynamodb';
 
 export const hatchet = Hatchet.init();
@@ -134,12 +134,12 @@ export const onCron = hatchet.workflow({
 onCron.task({
   name: 'trigger-all',
   fn: async (_, ctx) => {
-    const supabaseClient = getGenericSupabaseClient();
+    // const supabaseClient = getGenericSupabaseClient();
     const s3Client = getS3Client();
     const dynamodbClient = getDynamoDBClient();
     const appleBlobRepository = new AppleBlobRepository(
       dynamodbClient,
-      supabaseClient,
+      // supabaseClient,
       s3Client
     );
     const users = await appleBlobRepository.listAlbumsToRefresh();

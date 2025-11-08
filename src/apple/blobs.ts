@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   type PublicAlbumWebStream,
   webStreamSchema,
@@ -22,7 +21,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import type { GetItemResponse } from 'dynamodb-toolbox/entity/actions/get';
 import { ScanCommand } from 'dynamodb-toolbox/table/actions/scan';
 
 const applePhotosTable = new Table({
@@ -55,7 +53,7 @@ type WebStreamStatus = 'not_found' | 'found' | 'error';
 export class AppleBlobRepository {
   constructor(
     private readonly dynamoDBClient: DynamoDBClient,
-    private readonly supabaseClient: SupabaseClient,
+    // private readonly supabaseClient: SupabaseClient,
     private readonly s3Client: S3Client
   ) {
     applePhotosTable.documentClient =
@@ -94,84 +92,84 @@ export class AppleBlobRepository {
     };
   };
 
-  migrateAllSupabaseUsersToDynamoDB = async (): Promise<void> => {
-    let lastId = '';
+  // migrateAllSupabaseUsersToDynamoDB = async (): Promise<void> => {
+  //   let lastId = '';
 
-    while (true) {
-      const query = this.supabaseClient
-        .from(applePhotosTableName)
-        .select('id')
-        .order('id', { ascending: true });
+  //   while (true) {
+  //     const query = this.supabaseClient
+  //       .from(applePhotosTableName)
+  //       .select('id')
+  //       .order('id', { ascending: true });
 
-      if (lastId) {
-        query.gt('id', lastId);
-      }
+  //     if (lastId) {
+  //       query.gt('id', lastId);
+  //     }
 
-      const { data: listData, error: listError } = await query.limit(5);
+  //     const { data: listData, error: listError } = await query.limit(5);
 
-      if (listError) {
-        throw listError;
-      }
+  //     if (listError) {
+  //       throw listError;
+  //     }
 
-      console.log('listData', listData.length, lastId);
+  //     console.log('listData', listData.length, lastId);
 
-      if (listData.length === 0) {
-        break;
-      }
-      lastId = listData[listData.length - 1].id;
+  //     if (listData.length === 0) {
+  //       break;
+  //     }
+  //     lastId = listData[listData.length - 1].id;
 
-      // Iterate and write to dynamodb
-      for (const listUser of listData) {
-        const { data: user, error } = await this.supabaseClient
-          .from(applePhotosTableName)
-          .select('*')
-          .eq('id', listUser.id)
-          .single();
+  //     // Iterate and write to dynamodb
+  //     for (const listUser of listData) {
+  //       const { data: user, error } = await this.supabaseClient
+  //         .from(applePhotosTableName)
+  //         .select('*')
+  //         .eq('id', listUser.id)
+  //         .single();
 
-        if (error) {
-          console.error('Error fetching user', error);
-          throw error;
-        }
+  //       if (error) {
+  //         console.error('Error fetching user', error);
+  //         throw error;
+  //       }
 
-        console.log('Migrating user', listUser.id, {
-          webStreamSize: JSON.stringify(user.web_stream_blob).length,
-        });
+  //       console.log('Migrating user', listUser.id, {
+  //         webStreamSize: JSON.stringify(user.web_stream_blob).length,
+  //       });
 
-        if (user.web_stream_blob) {
-          const pubBlobCommand = new PutObjectCommand({
-            Bucket: 'trmnl-apple-photos',
-            Key: `${listUser.id}/web_stream_blob.json`,
-            Body: JSON.stringify(user.web_stream_blob),
-          });
+  //       if (user.web_stream_blob) {
+  //         const pubBlobCommand = new PutObjectCommand({
+  //           Bucket: 'trmnl-apple-photos',
+  //           Key: `${listUser.id}/web_stream_blob.json`,
+  //           Body: JSON.stringify(user.web_stream_blob),
+  //         });
 
-          await this.s3Client.send(pubBlobCommand);
-        }
+  //         await this.s3Client.send(pubBlobCommand);
+  //       }
 
-        const command = applePhotosEntity.build(PutItemCommand).item({
-          id: user.id,
-          user: user.user ? JSON.stringify(user.user) : undefined,
-          settings: user.settings ? JSON.stringify(user.settings) : undefined,
-          uninstalled_at: user.uninstalled_at
-            ? new Date(user.uninstalled_at).getTime()
-            : undefined,
-          updated_settings_at: user.updated_settings_at
-            ? new Date(user.updated_settings_at).getTime()
-            : undefined,
-          render_count: user.render_count ?? 0,
-          last_render_at: user.last_render_at
-            ? new Date(user.last_render_at).getTime()
-            : undefined,
-          apple_partition: user.apple_partition ?? undefined,
-          web_stream_blob_fetched_at: user.web_stream_blob_fetched_at
-            ? new Date(user.web_stream_blob_fetched_at).getTime()
-            : undefined,
-          crawl_status: user.crawl_status ?? undefined,
-          web_stream_status: user.web_stream_status ?? undefined,
-        });
-        await command.send();
-      }
-    }
-  };
+  //       const command = applePhotosEntity.build(PutItemCommand).item({
+  //         id: user.id,
+  //         user: user.user ? JSON.stringify(user.user) : undefined,
+  //         settings: user.settings ? JSON.stringify(user.settings) : undefined,
+  //         uninstalled_at: user.uninstalled_at
+  //           ? new Date(user.uninstalled_at).getTime()
+  //           : undefined,
+  //         updated_settings_at: user.updated_settings_at
+  //           ? new Date(user.updated_settings_at).getTime()
+  //           : undefined,
+  //         render_count: user.render_count ?? 0,
+  //         last_render_at: user.last_render_at
+  //           ? new Date(user.last_render_at).getTime()
+  //           : undefined,
+  //         apple_partition: user.apple_partition ?? undefined,
+  //         web_stream_blob_fetched_at: user.web_stream_blob_fetched_at
+  //           ? new Date(user.web_stream_blob_fetched_at).getTime()
+  //           : undefined,
+  //         crawl_status: user.crawl_status ?? undefined,
+  //         web_stream_status: user.web_stream_status ?? undefined,
+  //       });
+  //       await command.send();
+  //     }
+  //   }
+  // };
 
   createUserBlob = async (uuid: string, user: UserBlob) => {
     const command = applePhotosEntity.build(PutItemCommand).item({

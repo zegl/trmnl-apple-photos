@@ -1,7 +1,7 @@
 import Hatchet, { Priority } from '@hatchet-dev/typescript-sdk';
 import { NextResponse } from 'next/server';
 import { AppleBlobRepository } from '@/apple/blobs';
-import { getSupabaseClientForUser } from '@/supabase';
+// import { getSupabaseClientForUser } from '@/supabase';
 import { AppleRediscoverImagesRequestSchema } from './type';
 import { Result } from '@/result';
 import { getDynamoDBClient } from '@/dynamodb';
@@ -14,12 +14,12 @@ export async function POST(
     const body = await request.json();
     const parsedBody = AppleRediscoverImagesRequestSchema.parse(body);
 
-    const supabaseClient = getSupabaseClientForUser(parsedBody.user_uuid);
+    // const supabaseClient = getSupabaseClientForUser(parsedBody.user_uuid);
     const s3Client = getS3Client();
     const dynamodbClient = getDynamoDBClient();
     const appleBlobRepository = new AppleBlobRepository(
       dynamodbClient,
-      supabaseClient,
+      // supabaseClient,
       s3Client
     );
 
