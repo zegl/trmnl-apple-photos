@@ -413,7 +413,7 @@ export class AppleBlobRepository {
         .send();
 
       const refreshableUsers = (page.Items ?? []).filter(
-        (item) => item.uninstalled_at === null && item.settings !== null
+        (item) => !item.uninstalled_at && item.settings
       );
       userIdsToRefresh.push(
         ...refreshableUsers.map((item) => item.id as string)
