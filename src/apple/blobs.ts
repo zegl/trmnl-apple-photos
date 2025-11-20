@@ -419,6 +419,8 @@ export class AppleBlobRepository {
         ...refreshableUsers.map((item) => item.id as string)
       );
 
+      console.log('listAlbumsToRefresh: pagination: ', page.LastEvaluatedKey);
+
       lastEvaluatedKey = page.LastEvaluatedKey;
     } while (lastEvaluatedKey !== undefined);
 

@@ -148,6 +148,8 @@ onCron.task({
       throw new Error('Error listing all users', { cause: users.error });
     }
 
+    console.log('Found', users.data.length, 'users to refresh');
+
     // Split into chunks of 100
     const chunks = chunked(users.data, 100);
 
