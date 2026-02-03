@@ -33,13 +33,17 @@ export async function GET(request: Request): Promise<NextResponse> {
     },
     body: formData.toString(),
   });
-  const fetchTokenData = await fetchTokenResponse.json();
-  const _accessToken = fetchTokenData.access_token;
-  console.log('fetchTokenData', fetchTokenData);
 
-  if (fetchTokenData.error) {
-    return NextResponse.json({ ...fetchTokenData }, { status: 400 });
+  try {
+    const fetchTokenData = await fetchTokenResponse.json();
+    const _accessToken = fetchTokenData.access_token;
+    console.log('fetchTokenData', fetchTokenData);
+
+    return NextResponse.redirect(installationCallbackUrl);
+  } catch (error) {
+    console.error('Error parsing token response', error);
+    const errorResponse = await fetchTokenResponse.text();
+    console.error('Error response', errorResponse);
+    return NextResponse.json({ error: 'Failed to fetch token' }, { status: 500 });
   }
-
-  return NextResponse.redirect(installationCallbackUrl);
 }
