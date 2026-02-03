@@ -29,7 +29,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   );
   formData.append('grant_type', 'authorization_code');
 
-  const fetchTokenResponse = await fetch('https://usetrmnl.com/oauth/token', {
+  const fetchTokenResponse = await fetch('https://trmnl.com/oauth/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',

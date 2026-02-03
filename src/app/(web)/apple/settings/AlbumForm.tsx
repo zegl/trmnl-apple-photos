@@ -137,7 +137,7 @@ export default function AlbumForm({
     }
   };
 
-  const backToTrmnlUrl = `https://usetrmnl.com/plugin_settings/${user.user.plugin_setting_id}/edit?force_refresh=true`;
+  const backToTrmnlUrl = `https://trmnl.com/plugin_settings/${user.user.plugin_setting_id}/edit?force_refresh=true`;
 
   return (
     <div

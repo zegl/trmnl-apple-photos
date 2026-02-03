@@ -26,7 +26,7 @@ export default function Home() {
         Install the plugin from{' '}
         <a
           className="text-blue-500"
-          href="https://usetrmnl.com/plugin_settings/new?keyname=apple_photos"
+          href="https://trmnl.com/plugin_settings/new?keyname=apple_photos"
         >
           the TRMNL plugin page
         </a>

@@ -63,10 +63,10 @@ export async function POST(request: Request) {
       const markup = renderToString(
         <html lang="en">
           <head>
-            <script src="https://usetrmnl.com/js/latest/plugins.js" />
+            <script src="https://trmnl.com/js/latest/plugins.js" />
             <link
               rel="stylesheet"
-              href="https://usetrmnl.com/css/latest/plugins.css"
+              href="https://trmnl.com/css/latest/plugins.css"
             />
           </head>
           <body className="environment trmnl">
