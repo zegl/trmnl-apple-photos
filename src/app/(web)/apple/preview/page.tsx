@@ -1,5 +1,4 @@
 import { AppleBlobRepository } from '@/apple/blobs';
-// import { getSupabaseClientForUser } from '@/supabase';
 import FullScreenMessage from '@/app/FullScreenMessage';
 import { getPhotos } from '@/apple/photos';
 import Render from '@/app/Render';
