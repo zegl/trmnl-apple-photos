@@ -6,6 +6,7 @@ import {
   getPublicAlbumId,
   type PublicAlbumWebStream,
 } from '@/apple/apple-public-album';
+import sharp from 'sharp';
 
 type ImageResult = Result<{
   url: string;
@@ -40,14 +41,38 @@ export const getRandomPhotoFromWebStream = async ({
     randomPhoto.photoGuid
   );
 
-  const largestDerivative = Object.values(randomPhoto.derivatives).reduce(
-    (a, b) => {
-      return Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b;
-    }
-  );
+  const derivatives = Object.values(randomPhoto.derivatives);
+  const preferred = derivatives.filter((d) => {
+    const w = Number.parseInt(d.width);
+    return w >= 800 && w <= 2000;
+  });
+  const largestOf = (arr: typeof derivatives) =>
+    arr.reduce((a, b) =>
+      Number.parseInt(a.width) > Number.parseInt(b.width) ? a : b
+    );
+  const largestDerivative =
+    preferred.length > 0 ? largestOf(preferred) : largestOf(derivatives);
 
   const item = webAsset.items[largestDerivative.checksum];
-  const url = `https://${item.url_location}${item.url_path}`;
+  const imageUrl = `https://${item.url_location}${item.url_path}`;
+
+  // Fetch the image server-side and convert to base64 JPEG data URI.
+  // This avoids issues with: URL expiry, unsupported formats (HEIC), and
+  // race conditions where the renderer screenshots before the image loads.
+  const imageResponse = await fetch(imageUrl);
+  if (!imageResponse.ok) {
+    return {
+      success: false,
+      error: `Failed to fetch image: ${imageResponse.status}`,
+    };
+  }
+
+  const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+  const jpegBuffer = await sharp(imageBuffer)
+    .jpeg({ quality: 80 })
+    .toBuffer();
+  const base64 = jpegBuffer.toString('base64');
+  const url = `data:image/jpeg;base64,${base64}`;
 
   return {
     success: true,

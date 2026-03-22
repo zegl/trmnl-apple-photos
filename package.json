@@ -34,6 +34,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hook-form": "^7.66.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.17",
     "tsx": "^4.20.6",
     "zod": "^3.25.76"
