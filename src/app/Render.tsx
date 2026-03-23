@@ -2,10 +2,12 @@ export default function Render({
   url,
   size,
   show_message,
+  grayscale = true,
 }: {
   url?: string;
   size: string;
   show_message?: string;
+  grayscale?: boolean;
 }) {
   return (
     <div
@@ -34,18 +36,20 @@ export default function Render({
             }}
             className="image-dither"
           />
-          <div
-            style={{
-              backdropFilter: 'grayscale(100%)',
-              backgroundColor: 'rgba(255, 255, 255, 0.0)',
-              height: '100%',
-              width: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              zIndex: 1,
-            }}
-          />
+          {grayscale && (
+            <div
+              style={{
+                backdropFilter: 'grayscale(100%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.0)',
+                height: '100%',
+                width: '100%',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1,
+              }}
+            />
+          )}
         </>
       )}
     </div>

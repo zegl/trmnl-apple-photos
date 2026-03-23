@@ -48,6 +48,11 @@ export default async function Page({
     return <FullScreenMessage message="User not found :-(" />;
   }
 
+  const settingsResult = await appleBlobRepository.getUserSettings(user_uuid);
+  const grayscale = settingsResult.success
+    ? settingsResult.data.colorPreference !== 'original'
+    : true;
+
   const photos = await getPhotos({
     appleBlobRepository,
     user_uuid,
@@ -93,7 +98,7 @@ export default async function Page({
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <div className="environment trmnl">
           <div className="screen">
-            <Render url={url} size="full" />
+            <Render url={url} size="full" grayscale={grayscale} />
           </div>
         </div>
       </div>
@@ -102,7 +107,7 @@ export default async function Page({
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <div className="environment trmnl">
           <div className="screen">
-            <Render url={url} size="half_vertical" />
+            <Render url={url} size="half_vertical" grayscale={grayscale} />
           </div>
         </div>
       </div>
@@ -111,7 +116,7 @@ export default async function Page({
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <div className="environment trmnl">
           <div className="screen">
-            <Render url={url} size="half_horizontal" />
+            <Render url={url} size="half_horizontal" grayscale={grayscale} />
           </div>
         </div>
       </div>
@@ -120,7 +125,7 @@ export default async function Page({
       <div className="w-fit border-2 border-gray-300 rounded-md overflow-hidden">
         <div className="environment trmnl">
           <div className="screen">
-            <Render url={url} size="quadrant" />
+            <Render url={url} size="quadrant" grayscale={grayscale} />
           </div>
         </div>
       </div>

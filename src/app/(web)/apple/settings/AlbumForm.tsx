@@ -16,6 +16,7 @@ interface AlbumFormProps {
 
 interface FormValues {
   sharedAlbumUrl: string;
+  colorPreference: 'grayscale' | 'original';
 }
 
 export default function AlbumForm({
@@ -41,6 +42,7 @@ export default function AlbumForm({
   } = useForm<FormValues>({
     defaultValues: {
       sharedAlbumUrl: initialSettings?.sharedAlbumUrl || '',
+      colorPreference: initialSettings?.colorPreference ?? 'grayscale',
     },
   });
 
@@ -65,6 +67,7 @@ export default function AlbumForm({
     const settings: AppleSettings = {
       uuid,
       sharedAlbumUrl: data.sharedAlbumUrl,
+      colorPreference: data.colorPreference,
     };
 
     try {
@@ -206,6 +209,33 @@ export default function AlbumForm({
             </div>
           )}
         </div>
+
+        <fieldset>
+          <legend className="block text-sm/6 font-medium text-gray-900">
+            Color Preference
+          </legend>
+          <p className="text-sm text-gray-500 mt-1">
+            Grayscale is recommended for TRMNL OG and TRMNL X devices.
+          </p>
+          <div className="mt-2 flex flex-col gap-2">
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="radio"
+                value="grayscale"
+                {...register('colorPreference')}
+              />
+              Grayscale
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="radio"
+                value="original"
+                {...register('colorPreference')}
+              />
+              Original
+            </label>
+          </div>
+        </fieldset>
 
         {didSaveNewAlbum && (
           <div className="text-green-500 text-sm mt-2 bg-green-50 p-4">
