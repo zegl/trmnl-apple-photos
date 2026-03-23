@@ -214,7 +214,10 @@ export default function AlbumForm({
           <legend className="block text-sm/6 font-medium text-gray-900">
             Color Preference
           </legend>
-          <div className="mt-2 flex gap-6">
+          <p className="text-sm text-gray-500 mt-1">
+            Grayscale is recommended for TRMNL OG and TRMNL X devices.
+          </p>
+          <div className="mt-2 flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input
                 type="radio"
