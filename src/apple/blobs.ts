@@ -390,6 +390,48 @@ export class AppleBlobRepository {
     };
   };
 
+  listAllUsersAndSettings = async (): Promise<
+    Result<
+      Array<{
+        user_uuid: string;
+        settings: string | undefined;
+      }>
+    >
+  > => {
+    const command = applePhotosTable
+      .build(ScanCommand)
+      .entities(applePhotosEntity)
+      .options({
+        attributes: ['id', 'settings'],
+      });
+
+    let lastEvaluatedKey: Record<string, unknown> | undefined;
+    const users: Array<{
+      user_uuid: string;
+      settings: string | undefined;
+    }> = [];
+
+    do {
+      const page = await command
+        .options({ exclusiveStartKey: lastEvaluatedKey })
+        .send();
+
+      for (const item of page.Items ?? []) {
+        users.push({
+          user_uuid: item.id as string,
+          settings: item.settings as string | undefined,
+        });
+      }
+
+      lastEvaluatedKey = page.LastEvaluatedKey;
+    } while (lastEvaluatedKey !== undefined);
+
+    return {
+      success: true,
+      data: users,
+    };
+  };
+
   listAlbumsToRefresh = async (): Promise<Result<string[]>> => {
     const command = applePhotosTable
       .build(ScanCommand)
