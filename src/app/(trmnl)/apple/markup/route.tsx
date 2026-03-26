@@ -45,11 +45,6 @@ export async function POST(request: Request) {
     s3Client
   );
 
-  const settingsResult = await appleBlobRepository.getUserSettings(user_uuid);
-  const grayscale = settingsResult.success
-    ? settingsResult.data.colorPreference !== 'original'
-    : true;
-
   const photos = await getPhotos({
     appleBlobRepository,
     user_uuid,
@@ -75,7 +70,7 @@ export async function POST(request: Request) {
             />
           </head>
           <body className="environment trmnl">
-            <Render url={url} size={size.size} show_message={show_message} grayscale={grayscale} />
+            <Render url={url} size={size.size} show_message={show_message} />
           </body>
         </html>
       );

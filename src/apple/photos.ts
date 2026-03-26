@@ -16,10 +16,12 @@ export const getRandomPhotoFromWebStream = async ({
   partition,
   albumId,
   web_stream_blob,
+  grayscale,
 }: {
   partition: string;
   albumId: string;
   web_stream_blob: PublicAlbumWebStream;
+  grayscale: boolean;
 }): Promise<ImageResult> => {
   const photos = web_stream_blob.photos
     .filter((photo) => photo.mediaAssetType !== 'video')
@@ -68,8 +70,12 @@ export const getRandomPhotoFromWebStream = async ({
   }
 
   const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-  const jpegBuffer = await sharp(imageBuffer)
-    .resize(1872, 1404, { fit: 'inside', withoutEnlargement: true })
+  let pipeline = sharp(imageBuffer)
+    .resize(1872, 1404, { fit: 'inside', withoutEnlargement: true });
+  if (grayscale) {
+    pipeline = pipeline.grayscale();
+  }
+  const jpegBuffer = await pipeline
     .jpeg({ quality: 60 })
     .toBuffer();
   const base64 = jpegBuffer.toString('base64');
@@ -113,6 +119,7 @@ export const getPhotos = async ({
       partition: webStreamResult.data.apple_partition,
       albumId: getPublicAlbumId(settings.data.sharedAlbumUrl),
       web_stream_blob: webStreamResult.data.web_stream_blob,
+      grayscale: settings.data.colorPreference !== 'original',
     });
     if (imageFromCachedWebStream.success) {
       return imageFromCachedWebStream;
