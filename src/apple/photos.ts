@@ -69,7 +69,8 @@ export const getRandomPhotoFromWebStream = async ({
 
   const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
   const jpegBuffer = await sharp(imageBuffer)
-    .jpeg({ quality: 80 })
+    .resize(1872, 1404, { fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 60 })
     .toBuffer();
   const base64 = jpegBuffer.toString('base64');
   const url = `data:image/jpeg;base64,${base64}`;
