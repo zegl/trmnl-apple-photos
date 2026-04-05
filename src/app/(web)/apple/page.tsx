@@ -10,6 +10,18 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="flex flex-col gap-4">
+      <p className="font-bold">
+        This plugin has been acquired by TRMNL and is now a first-party plugin.
+        Check it out at{' '}
+        <a
+          className="text-blue-500"
+          href="https://trmnl.com/integrations/apple-photos"
+        >
+          trmnl.com/integrations/apple-photos
+        </a>
+        .
+      </p>
+
       <p>
         Hey! This is a plugin for TRMNL, that displays a random photo from a
         Apple Photos album.
@@ -31,17 +43,6 @@ export default function Home() {
           the TRMNL plugin page
         </a>
         .
-      </p>
-
-      <p>
-        No bugs?{' '}
-        <a
-          className="text-blue-500"
-          href="https://buy.polar.sh/polar_cl_I7pc5Mh2nCfQk3cyLow5mxm6qg0ncpb3Ru8bu0qRKzy"
-        >
-          Donate
-        </a>{' '}
-        to support it's development. ❤️
       </p>
 
       <p>
