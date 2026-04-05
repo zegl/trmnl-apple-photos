@@ -11,13 +11,12 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-4">
       <p className="font-bold">
-        This plugin has been acquired by TRMNL and is now a first-party plugin.
-        Check it out at{' '}
+        This plugin has been acquired by TRMNL and is now a{' '}
         <a
           className="text-blue-500"
           href="https://trmnl.com/integrations/apple-photos"
         >
-          trmnl.com/integrations/apple-photos
+          first-party plugin
         </a>
         .
       </p>
